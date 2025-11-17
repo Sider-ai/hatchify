@@ -1,5 +1,5 @@
 from functools import lru_cache
-from typing import Type
+from typing import Type, Tuple
 
 from dotenv import load_dotenv
 from pydantic import Field, BaseModel
@@ -36,7 +36,7 @@ class AppSettings(BaseSettings):
             env_settings: PydanticBaseSettingsSource,
             dotenv_settings: PydanticBaseSettingsSource,
             file_secret_settings: PydanticBaseSettingsSource,
-    ) -> tuple[PydanticBaseSettingsSource, ...]:
+    ) -> Tuple[PydanticBaseSettingsSource, ...]:
         return (
             init_settings,
             YamlConfigSettingsSource(settings_cls),
