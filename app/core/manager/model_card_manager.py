@@ -69,6 +69,3 @@ class ModelCardManager(BaseModel):
 model_card_manager: ModelCardManager = ModelCardManager.parse_toml(
     Constants.Path.MODELS_TOML
 )
-if __name__ == '__main__':
-    for model in model_card_manager.get_all_models():
-        print(model.model_dump_json(indent=2))
