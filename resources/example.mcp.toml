@@ -1,0 +1,118 @@
+# ============================================
+# MCP 服务器配置文件
+# 支持三种连接类型: stdio, sse, streamablehttp
+# ============================================
+
+# --------------------------------------------
+# Stdio 类型示例
+# 适用于命令行启动的 MCP 服务器
+# --------------------------------------------
+[[servers]]
+name = "filesystem"
+transport = "stdio"
+enabled = true
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]
+prefix = "fs"
+
+# 可选: 工作目录和编码设置 (与 command/args 同级)
+cwd = "/tmp"
+encoding = "utf-8"
+encoding_error_handler = "strict"
+
+# 可选: 环境变量
+[servers.env]
+NODE_ENV = "production"
+
+
+[[servers]]
+name = "aws-docs"
+transport = "stdio"
+enabled = false
+command = "uvx"
+args = ["awslabs.aws-documentation-mcp-server@latest"]
+prefix = "aws"
+
+# 可选: 工具过滤器
+[servers.tool_filters]
+allowed = ["search_documentation", "read_documentation"]
+
+
+# --------------------------------------------
+# SSE 类型示例
+# 适用于 Server-Sent Events 协议
+# --------------------------------------------
+[[servers]]
+name = "calculator-sse"
+transport = "sse"
+enabled = false
+url = "http://localhost:8000/sse"
+prefix = "calc"
+
+# 可选: 超时设置 (必须在 headers 之前)
+timeout = 5
+sse_read_timeout = 300
+
+# 可选: HTTP headers
+[servers.headers]
+Authorization = "Bearer your-token"
+X-Custom-Header = "value"
+
+
+# --------------------------------------------
+# StreamableHTTP 类型示例
+# 适用于基于 HTTP 的 MCP 服务器
+# --------------------------------------------
+[[servers]]
+name = "weather-api"
+transport = "streamablehttp"
+enabled = false
+url = "http://localhost:8001/mcp/"
+prefix = "weather"
+
+# 可选: 超时和连接设置 (必须在 headers 之前)
+timeout = 30
+sse_read_timeout = 300
+terminate_on_close = true
+
+# 可选: HTTP headers
+[servers.headers]
+Authorization = "Bearer your-token"
+
+
+# ============================================
+# 配置说明
+# ============================================
+#
+# 通用字段:
+#   name              - 服务器唯一标识 (必填)
+#   transport         - stdio | sse | streamablehttp (必填)
+#   startup_timeout   - 启动时间
+#   enabled           - true | false (必填)
+#   prefix            - 工具名称前缀 (可选)
+#
+# Stdio 类型字段:
+#   command           - 启动命令,如 "uvx", "npx", "python" (必填)
+#   args              - 命令参数数组 (可选)
+#   env               - 环境变量字典 (可选)
+#   cwd               - 工作目录 (可选)
+#   encoding          - 编码格式 (可选)
+#   encoding_error_handler - 编码错误处理 (可选)
+#
+# SSE 类型字段:
+#   url               - SSE 服务器地址 (必填)
+#   headers           - HTTP headers 字典 (可选)
+#   timeout           - 连接超时秒数 (可选, 默认 5)
+#   sse_read_timeout  - SSE 读取超时秒数 (可选, 默认 300)
+#
+# StreamableHTTP 类型字段:
+#   url               - HTTP 服务器地址 (必填)
+#   headers           - HTTP headers 字典 (可选)
+#   timeout           - 连接超时秒数 (可选, 默认 30)
+#   sse_read_timeout  - SSE 读取超时秒数 (可选, 默认 300)
+#   terminate_on_close - 关闭时终止连接 (可选, 默认 true)
+#
+# 工具过滤器 (可选):
+#   tool_filters.allowed  - 白名单,只加载列出的工具
+#   tool_filters.rejected - 黑名单,排除列出的工具
+#

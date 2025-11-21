@@ -15,12 +15,13 @@ from starlette.responses import JSONResponse
 
 from app.common.domain.result.result import Result
 from app.common.settings.settings import get_hatchify_settings
+from app.core.manager.tool_manager import async_load_mcp_server
 
 hatchify_settings = get_hatchify_settings()
 
 
 async def initialize_extensions():
-    ...
+    await async_load_mcp_server()
 
 
 async def close_extensions():

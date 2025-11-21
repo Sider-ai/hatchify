@@ -139,7 +139,7 @@ class GenericRepository(BaseRepository[T]):
     ) -> Optional[T]:
         stmt = (
             sql_update(self.entity_type)
-            .where(self.entity_type.id == entity_id)  # type: ignore[arg-type]
+            .where(self.entity_type.id == entity_id)  # transport: ignore[arg-transport]
             .values(**update_data)
             .returning(self.entity_type)
         )
@@ -153,6 +153,6 @@ class GenericRepository(BaseRepository[T]):
         return merged
 
     async def delete_by_id(self, session: AsyncSession, entity_id: Any) -> bool:
-        stmt = delete(self.entity_type).where(self.entity_type.id == entity_id)  # type: ignore[arg-type]
+        stmt = delete(self.entity_type).where(self.entity_type.id == entity_id)  # transport: ignore[arg-transport]
         result = await session.execute(stmt)
         return cast(int, result.rowcount) > 0

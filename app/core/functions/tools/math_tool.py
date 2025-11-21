@@ -2,7 +2,7 @@
 
 Demonstrates:
 1. How to get tool's input schema as Pydantic Model for Agent structured_output
-2. How to auto-generate output schema from tool's return type
+2. How to auto-generate output schema from tool's return transport
 """
 
 from strands import ToolContext, tool

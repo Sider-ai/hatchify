@@ -9,6 +9,7 @@ class Constants:
         APP_PATH: str = os.path.join(ROOT_PATH, "app")
         RESOURCES_PATH: str = os.path.join(ROOT_PATH, "resources")
         MODELS_TOML: str = os.path.join(RESOURCES_PATH, "models.toml")
+        MCP_TOML: str = os.path.join(RESOURCES_PATH, "mcp.toml")
         ENV_PATH: str = os.path.join(RESOURCES_PATH, ".env")
         YAML_FILE_PATH: str = os.path.join(
             RESOURCES_PATH, f"{os.environ.get('ENVIRONMENT', 'development')}.yaml"

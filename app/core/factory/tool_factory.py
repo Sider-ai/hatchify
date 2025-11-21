@@ -1,14 +1,14 @@
 from copy import deepcopy
-from typing import Dict, Self
+from typing import Dict, Self, Union
 
-from strands.tools.decorator import DecoratedFunctionTool
+from strands.types.tools import AgentTool
 
 
 class ToolRouter:
     def __init__(self) -> None:
-        self._tools: Dict[str, DecoratedFunctionTool] = {}
+        self._tools: Dict[str, Union[AgentTool]] = {}
 
-    def register(self, _tool: DecoratedFunctionTool) -> None:
+    def register(self, _tool: AgentTool) -> None:
         self._tools[_tool.tool_name] = _tool
 
     def include_router(
@@ -30,18 +30,18 @@ class ToolRouter:
             if new_name == name:
                 self._tools[new_name] = item
             else:
-                if not isinstance(item, DecoratedFunctionTool):
+                if not isinstance(item, AgentTool):
                     raise ValueError(
                         "Cannot prefix a 'factory' tool; please instantiate first."
                     )
-                cloned: DecoratedFunctionTool = deepcopy(item)
+                cloned: AgentTool = deepcopy(item)
                 cloned._tool_name = new_name
                 self._tools[new_name] = cloned
 
-    def get_tool(self, name: str) -> DecoratedFunctionTool:
+    def get_tool(self, name: str) -> AgentTool:
         return self._tools[name]
 
     def get_all_tools(
             self,
-    ) -> Dict[str, DecoratedFunctionTool]:
+    ) -> Dict[str, AgentTool]:
         return dict(self._tools)

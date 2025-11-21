@@ -66,32 +66,32 @@ class FunctionNode(MultiAgentBase):
                 self.hooks.add_hook(hook)
         self._resume_from_session = False
 
-        # Validate tool return type - MUST be BaseModel for type-safe output
+        # Validate tool return transport - MUST be BaseModel for transport-safe output
         self._validate_tool_return_type()
 
         run_async(lambda: self.hooks.invoke_callbacks_async(MultiAgentInitializedEvent(self)))
 
     def _validate_tool_return_type(self) -> None:
-        """Validate that tool returns a BaseModel for type-safe structured output.
+        """Validate that tool returns a BaseModel for transport-safe structured output.
 
         Raises:
-            ValueError: If tool return type is not a BaseModel subclass
+            ValueError: If tool return transport is not a BaseModel subclass
         """
         return_type = self.tool._metadata.type_hints.get('return')
 
         if not return_type or return_type is type(None):
             raise ValueError(
-                f"Tool '{self.tool.tool_name}' has no return type annotation. "
-                f"FunctionNode requires tools to have a BaseModel return type for type-safe output. "
+                f"Tool '{self.tool.tool_name}' has no return transport annotation. "
+                f"FunctionNode requires tools to have a BaseModel return transport for transport-safe output. "
                 f"Example: async def {self.tool.tool_name}(...) -> YourOutputModel:"
             )
 
-        # Check if return type is BaseModel
+        # Check if return transport is BaseModel
         if not (isinstance(return_type, type) and issubclass(return_type, BaseModel)):
             raise ValueError(
-                f"Tool '{self.tool.tool_name}' return type must be a Pydantic BaseModel, "
+                f"Tool '{self.tool.tool_name}' return transport must be a Pydantic BaseModel, "
                 f"but got '{return_type.__name__}'. "
-                f"This ensures type-safe structured output for downstream agents. "
+                f"This ensures transport-safe structured output for downstream agents. "
                 f"Define an output model: class {self.tool.tool_name.capitalize()}Output(BaseModel): ..."
             )
 
@@ -225,11 +225,11 @@ class FunctionNode(MultiAgentBase):
 
         node_result = graph.state.results[from_node_id]
 
-        # Validate result type
+        # Validate result transport
         if not isinstance(node_result.result, AgentResult):
             raise ValueError(
                 f"Dependency node '{from_node_id}' must be an Agent node, "
-                f"but result type is '{type(node_result.result).__name__}'. "
+                f"but result transport is '{type(node_result.result).__name__}'. "
                 f"FunctionNode can only receive Agent structured outputs."
             )
         if not node_result.result.structured_output:
@@ -261,9 +261,9 @@ class FunctionNode(MultiAgentBase):
             self.tool._metadata.inject_special_parameters(validated_input, tool_use, invocation_state)
 
             if inspect.iscoroutinefunction(self.tool._tool_func):
-                result = await self.tool._tool_func(**validated_input)  # type: ignore
+                result = await self.tool._tool_func(**validated_input)  # transport: ignore
             else:
-                result = await asyncio.to_thread(self.tool._tool_func, **validated_input)  # type: ignore
+                result = await asyncio.to_thread(self.tool._tool_func, **validated_input)  # transport: ignore
 
             execution_time = round((time.time() - start_time) * 1000)
             node_result = NodeResult(
