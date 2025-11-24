@@ -3,15 +3,18 @@ name = "hatchify"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.121.2",
     "fastapi-pagination>=0.15.0",
+    "google-genai>=1.52.0",
+    "instructor[litellm]>=1.13.0",
     "litellm>=1.80.0",
     "loguru>=0.7.3",
     "psycopg[binary,pool]>=3.2.12",
     "pydantic-settings[yaml]>=2.12.0",
     "sqlalchemy>=2.0.44",
     "strands-agents>=1.16.0",
+    "strands-agents-tools>=0.2.16",
     "uvicorn>=0.38.0",
 ]

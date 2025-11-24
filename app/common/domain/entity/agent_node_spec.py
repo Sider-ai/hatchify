@@ -1,8 +1,8 @@
-from typing import List, Optional, Dict, Any
-
-from pydantic import Field, BaseModel
+from typing import List, Optional, Dict, Any, Type
 
 from app.common.domain.enums.agent_category import AgentCategory
+from app.utils.json_schema_2_pydantic import jsonschema_to_pydantic
+from pydantic import Field, BaseModel, computed_field
 
 
 class AgentNode(BaseModel):
@@ -22,8 +22,22 @@ class AgentNode(BaseModel):
     # Router/Orchestrator 的输出 Schema (用于文档和验证)
     structured_output_schema: Optional[Dict[str, Any]] = Field(
         default=None,
-        description="Pydantic model 的 JSON Schema（从 model_json_schema() 生成）"
+        description="Agent 输出的 JSON Schema"
     )
+
+    @computed_field
+    @property
+    def structured_output_model(self) -> Optional[Type[BaseModel]]:
+        if not self.structured_output_schema:
+            return None
+        
+        model_name = f"{self.name.capitalize()}Output"
+        schema_with_title = {
+            "title": model_name,
+            **self.structured_output_schema
+        }
+
+        return jsonschema_to_pydantic(schema_with_title)
 
     class Config:
         json_schema_extra = {

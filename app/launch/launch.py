@@ -5,6 +5,7 @@
 # @Email   : amashiro2233@gmail.com
 # @File    : launch
 # @Software: PyCharm
+import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -15,13 +16,16 @@ from starlette.responses import JSONResponse
 
 from app.common.domain.result.result import Result
 from app.common.settings.settings import get_hatchify_settings
-from app.core.manager.tool_manager import async_load_mcp_server
+from app.core.manager.tool_manager import async_load_mcp_server, async_load_strands_tools
 
 hatchify_settings = get_hatchify_settings()
 
 
 async def initialize_extensions():
-    await async_load_mcp_server()
+    await asyncio.gather(
+        async_load_mcp_server(),
+        async_load_strands_tools(),
+    )
 
 
 async def close_extensions():

@@ -6,10 +6,12 @@ Demonstrates:
 """
 
 from strands import ToolContext, tool
+from strands.tools.decorator import DecoratedFunctionTool
 
 from app.core.factory.tool_factory import ToolRouter
 
-math_router = ToolRouter()
+# math_router 只包含 @tool 装饰的函数
+math_router = ToolRouter[DecoratedFunctionTool]()
 
 
 @tool(name="add", description="Add two numbers", context=True)

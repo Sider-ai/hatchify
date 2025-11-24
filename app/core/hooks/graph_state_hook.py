@@ -1,13 +1,12 @@
 from typing import Any
 
-from strands.experimental.hooks.multiagent import BeforeMultiAgentInvocationEvent, \
-    AfterNodeCallEvent, BeforeNodeCallEvent
+from strands.experimental.hooks.multiagent import AfterNodeCallEvent, BeforeNodeCallEvent
 from strands.hooks import HookProvider, HookRegistry
 
 
 class GraphStateHook(HookProvider):
 
-    def register_hooks(self, registry: HookRegistry, **kwargs: Any) -> None:
+    def register_hooks(self, registry: HookRegistry, **kwargs: Any) -> None:  # type: ignore
         registry.add_callback(BeforeNodeCallEvent, self.before_node_call)
         registry.add_callback(AfterNodeCallEvent, self.after_node_call)
 

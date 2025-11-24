@@ -1,5 +1,5 @@
 from functools import lru_cache
-from typing import Type, Tuple
+from typing import Type, Tuple, Optional
 
 from dotenv import load_dotenv
 from pydantic import Field, BaseModel
@@ -15,8 +15,25 @@ from app.common.constants.constants import Constants
 load_dotenv(dotenv_path=Constants.Path.ENV_PATH)
 
 
+class ProviderSettings(BaseSettings):
+    model: str
+    provider: Optional[str] = Field(default=None)
+
+
+class ModelSettings(BaseSettings):
+    """不同用途的模型配置"""
+    spec_generator: ProviderSettings = Field(
+        ...,
+        description="用于生成 GraphSpec 架构的模型"
+    )
+    schema_extractor: ProviderSettings = Field(
+        ...,
+        description="用于从 Agent Instructions 提取 JSON Schema 的模型"
+    )
+
+
 class HatchifySettings(BaseModel):
-    ...
+    models: ModelSettings | None = Field(default=None)
 
 
 class AppSettings(BaseSettings):

@@ -39,7 +39,7 @@ class FunctionState:
     result: Optional[NodeResult] = field(default=None)
 
 
-class FunctionNode(MultiAgentBase):
+class FunctionNodeWrapper(MultiAgentBase):
     """Execute deterministic Python functions as graph nodes.
 
     This node wraps a DecoratedFunctionTool and executes it as part of a multi-agent graph.
@@ -82,7 +82,7 @@ class FunctionNode(MultiAgentBase):
         if not return_type or return_type is type(None):
             raise ValueError(
                 f"Tool '{self.tool.tool_name}' has no return transport annotation. "
-                f"FunctionNode requires tools to have a BaseModel return transport for transport-safe output. "
+                f"FunctionNodeWrapper requires tools to have a BaseModel return transport for transport-safe output. "
                 f"Example: async def {self.tool.tool_name}(...) -> YourOutputModel:"
             )
 
@@ -182,7 +182,7 @@ class FunctionNode(MultiAgentBase):
 
         # Get structured output from dependency node
         if graph is None:
-            raise ValueError("FunctionNode must run in a Graph, but source_graph not found")
+            raise ValueError("FunctionNodeWrapper must run in a Graph, but source_graph not found")
 
         # Find current node
         current_node = None
@@ -192,7 +192,7 @@ class FunctionNode(MultiAgentBase):
                 break
 
         if not current_node:
-            raise ValueError(f"Cannot find FunctionNode in Graph (id={self.id})")
+            raise ValueError(f"Cannot find FunctionNodeWrapper in Graph (id={self.id})")
 
         # Find incoming edges (dependency nodes)
         incoming_edges = [edge for edge in graph.edges if edge.to_node == current_node]
@@ -200,15 +200,15 @@ class FunctionNode(MultiAgentBase):
         # Validate single dependency
         if len(incoming_edges) == 0:
             raise ValueError(
-                f"FunctionNode '{self.id}' has no dependency nodes. "
-                f"FunctionNode must have exactly one input node."
+                f"FunctionNodeWrapper '{self.id}' has no dependency nodes. "
+                f"FunctionNodeWrapper must have exactly one input node."
             )
 
         if len(incoming_edges) > 1:
             dependency_ids = [edge.from_node.node_id for edge in incoming_edges]
             raise ValueError(
-                f"FunctionNode '{self.id}' has multiple dependencies: {dependency_ids}. "
-                f"FunctionNode can only accept one input. Ensure only one node connects to this FunctionNode."
+                f"FunctionNodeWrapper '{self.id}' has multiple dependencies: {dependency_ids}. "
+                f"FunctionNodeWrapper can only accept one input. Ensure only one node connects to this FunctionNodeWrapper."
             )
 
         # Get the single dependency node
@@ -220,7 +220,7 @@ class FunctionNode(MultiAgentBase):
         if from_node_id not in graph.state.results:
             raise ValueError(
                 f"Dependency node '{from_node_id}' has not executed yet or produced no result. "
-                f"FunctionNode can only run after its dependency completes."
+                f"FunctionNodeWrapper can only run after its dependency completes."
             )
 
         node_result = graph.state.results[from_node_id]
@@ -230,7 +230,7 @@ class FunctionNode(MultiAgentBase):
             raise ValueError(
                 f"Dependency node '{from_node_id}' must be an Agent node, "
                 f"but result transport is '{type(node_result.result).__name__}'. "
-                f"FunctionNode can only receive Agent structured outputs."
+                f"FunctionNodeWrapper can only receive Agent structured outputs."
             )
         if not node_result.result.structured_output:
             raise ValueError(

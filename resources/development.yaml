@@ -1,2 +1,10 @@
 hatchify:
   application: hatchify-dev
+  models:
+    spec_generator:
+      model: gemini-2.5-pro
+      provider: gemini  # Use native gemini for better tool calling compatibility
+    schema_extractor:
+      model: gemini-2.5-pro
+      provider: gemini
+

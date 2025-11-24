@@ -3,7 +3,7 @@ from typing import List
 from pydantic import BaseModel, Field
 
 from app.common.domain.entity.agent_node_spec import AgentNode
-from app.common.domain.entity.processor_node_spec import ProcessorNode
+from app.common.domain.entity.function_node_spec import FunctionNode
 
 
 class Edge(BaseModel):
@@ -31,13 +31,13 @@ class GraphSpec(BaseModel):
         default_factory=list,
         description="Agent 节点列表"
     )
-    processors: List[ProcessorNode] = Field(
+    functions: List[FunctionNode] = Field(
         default_factory=list,
-        description="Processor 节点列表（确定性函数节点）"
+        description="Function 节点列表（确定性函数节点）"
     )
     nodes: List[str] = Field(
         ...,
-        description="所有节点名称列表（agents + processors 的所有节点名）"
+        description="所有节点名称列表（agents + functions 的所有节点名）"
     )
     edges: List[Edge] = Field(
         ...,

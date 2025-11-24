@@ -19,6 +19,9 @@ class ModelCard(BaseModel):
         default=16384, description="maximum context window size"
     )
     description: str = Field(..., description="human readable model description")
+    enabled: bool = Field(
+        default=True, description="whether this model is enabled"
+    )
     provider_id: Optional[str] = Field(
         default=None, description="id of the provider this model belongs to"
     )
@@ -28,9 +31,13 @@ class ProviderCard(BaseModel):
     id: str = Field(..., description="provider id used in API calls (e.g. openai)")
     name: str = Field(..., description="human-readable provider name")
     family: str = Field(..., description="family (e.g. openai, anthropic)")
-    base_url: str
-    api_key: str = ""
+    base_url: Optional[str] = Field(default=None, description="provider url")
+    api_key: Optional[str] = Field(default=None, description="provider url")
     enabled: bool = False
+    priority: int = Field(
+        default=100,
+        description="provider priority for fallback (lower number = higher priority)"
+    )
     models: List[ModelCard] = Field(default_factory=list)
 
     def model_post_init(self, __context):
