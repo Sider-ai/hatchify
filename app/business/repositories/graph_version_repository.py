@@ -14,9 +14,9 @@ class GraphVersionRepository(GenericRepository[GraphVersionTable]):
         super().__init__(GraphVersionTable)
 
     async def get_max_version_by_graph(
-        self,
-        session: AsyncSession,
-        graph_id: str
+            self,
+            session: AsyncSession,
+            graph_id: str
     ) -> Optional[int]:
         """获取指定 graph 的最大 version 号"""
         stmt = (
@@ -29,9 +29,9 @@ class GraphVersionRepository(GenericRepository[GraphVersionTable]):
         return max_version
 
     async def get_latest_version_by_graph(
-        self,
-        session: AsyncSession,
-        graph_id: str
+            self,
+            session: AsyncSession,
+            graph_id: str
     ) -> Optional[GraphVersionTable]:
         """获取指定 graph 的最新版本记录"""
         stmt = (
@@ -45,9 +45,9 @@ class GraphVersionRepository(GenericRepository[GraphVersionTable]):
         return result.scalar_one_or_none()
 
     async def list_drafts_by_graph(
-        self,
-        session: AsyncSession,
-        graph_id: str,
+            self,
+            session: AsyncSession,
+            graph_id: str,
     ) -> list[GraphVersionTable]:
         """列出指定 graph 的草稿版本（按创建时间升序）"""
         stmt = (

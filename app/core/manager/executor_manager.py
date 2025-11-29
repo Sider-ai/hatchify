@@ -27,9 +27,9 @@ class StreamManager:
 
     @classmethod
     async def create(
-        cls,
-        task_id: str,
-        handler: BaseStreamHandler
+            cls,
+            task_id: str,
+            handler: BaseStreamHandler
     ) -> BaseStreamHandler:
         """创建并注册流式 handler"""
         async with cls._lock:

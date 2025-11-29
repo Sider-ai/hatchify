@@ -92,7 +92,8 @@ def infer_webhook_spec_from_schema(input_schema: Dict[str, Any] | None) -> Webho
             data_fields.append(field_name)
 
     # 根据是否有文件字段决定 input_type
-    input_type: Literal["application/json", "multipart/form-data"] = "multipart/form-data" if file_fields else "application/json"
+    input_type: Literal[
+        "application/json", "multipart/form-data"] = "multipart/form-data" if file_fields else "application/json"
 
     return WebhookSpec(
         input_type=input_type,

@@ -1,4 +1,4 @@
-from typing import TypeVar, Type, List, Optional, Any, Tuple
+from typing import Type, List, Optional, Any, Tuple
 
 from fastapi import Query
 from fastapi_pagination import Page, Params
@@ -6,7 +6,6 @@ from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy import select, desc as sql_desc, asc as sql_asc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import Select
-
 
 
 class CustomParams(Params):

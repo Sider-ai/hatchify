@@ -12,7 +12,6 @@ from strands.types.content import ContentBlock, Role
 from app.business.db.session import transaction, AsyncSessionLocal
 from app.business.manager.repository_manager import RepositoryManager
 from app.business.manager.service_manager import ServiceManager
-from app.business.models.graph import GraphTable
 from app.business.models.messages import MessageTable
 from app.business.models.session import SessionTable
 from app.business.repositories.session_repository import SessionRepository
@@ -24,12 +23,10 @@ from app.common.domain.enums.conversation_mode import ConversationMode
 from app.common.domain.enums.message_role import MessageRole
 from app.common.domain.enums.session_scene import SessionScene
 from app.common.domain.requests.graph import ConversationRequest
-from app.common.domain.structured_output.graph_generation_output import AgentSchema
 from app.common.domain.structured_output.graph_generation_output import (
     GraphArchitectureOutput,
     SchemaExtractionOutput,
 )
-from app.common.domain.structured_output.pre_defined_schema import get_predefined_schema
 from app.common.event.base_event import StreamEvent, ResultEvent
 from app.common.event.edit_event import PhaseEvent
 from app.common.settings.settings import get_hatchify_settings
@@ -46,12 +43,14 @@ from app.core.prompts.prompts import (
 from app.core.utils.json_generator import json_generator
 from app.core.utils.schema_utils import generate_output_schema
 
+settings = get_hatchify_settings()
+
 
 class GraphSpecGenerator(BaseStreamHandler):
 
     def __init__(
             self,
-            source_id:  str,
+            source_id: str,
             model_card_manager: ModelCardManager,
             tool_router: ToolRouter,
             function_router: ToolRouter[DecoratedFunctionTool],
@@ -60,10 +59,6 @@ class GraphSpecGenerator(BaseStreamHandler):
         self.model_card_manager = model_card_manager
         self.tool_router = tool_router
         self.function_router = function_router
-
-        settings = get_hatchify_settings()
-        if not settings or not settings.models:
-            raise ValueError("No models configuration found in the configuration file")
 
         self.spec_gen_config = settings.models.spec_generator
         self.spec_ext_config = settings.models.spec_generator
@@ -324,13 +319,13 @@ class GraphSpecGenerator(BaseStreamHandler):
                 type="phase",
                 data=PhaseEvent(phase="prepare", message="Initialization messages"),
             )
-            service = ServiceManager.get_service(GraphService)
+            graph_service = ServiceManager.get_service(GraphService)
             session_repo = RepositoryManager.get_repository(SessionRepository)
 
             # TODO 目前仅支持用户文本，暂不支持其他消息类型和二进制内容
-            history_db_messages = await service.get_recent_messages(session, session_id)
+            history_db_messages = await graph_service.get_recent_messages(session, session_id)
             history_messages: List[Dict[str, Any]] = LiteLLMModel.format_request_messages(
-                service.db_messages_to_messages(history_db_messages)
+                graph_service.db_messages_to_messages(history_db_messages)
             )
             user_messages = LiteLLMModel.format_request_messages(request.messages)
 
@@ -342,7 +337,7 @@ class GraphSpecGenerator(BaseStreamHandler):
                 session_obj = await session_repo.find_by_id(session, session_id)
                 # create session and graph table
                 if not session_obj:
-                    graph_obj = await service.create(
+                    graph_obj = await graph_service.create(
                         session,
                         {
                             "name": f"graph_{session_id}",
@@ -358,9 +353,9 @@ class GraphSpecGenerator(BaseStreamHandler):
                     )
                     await session_repo.save(session, session_obj)
                 else:
-                    graph_obj = await service.get_by_id(session, cast(str, session_obj.graph_id))
+                    graph_obj = await graph_service.get_by_id(session, cast(str, session_obj.graph_id))
                     if not graph_obj:
-                        graph_obj = await service.create(
+                        graph_obj = await graph_service.create(
                             session,
                             {
                                 "name": f"graph_{session_obj.graph_id}_recreated",
@@ -406,7 +401,7 @@ class GraphSpecGenerator(BaseStreamHandler):
                     data=ResultEvent(
                         data={
                             "graph_id": graph_obj.id,
-                            "spec": graph_spec.model_dump(),
+                            "spec": graph_spec.model_dump(exclude_none=True),
                         }
                     ),
                 )
@@ -415,11 +410,11 @@ class GraphSpecGenerator(BaseStreamHandler):
 
                 if request.mode == ConversationMode.EDIT:
                     update_data: Dict[str, Any] = {
-                        "spec": graph_spec.model_dump(),
                         "name": graph_spec.name,
                         "description": graph_spec.description,
+                        "current_spec": graph_spec.model_dump(exclude_none=True),
                     }
-                    await service.update_by_id(
+                    await graph_service.update_by_id(
                         session,
                         cast(str, graph_obj.id),
                         update_data,

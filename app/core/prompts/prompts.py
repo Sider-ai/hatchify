@@ -60,7 +60,7 @@ GRAPH_GENERATOR_SYSTEM_PROMPT = dedent(
     "   - edges: Connections between nodes (from_node -> to_node)\n"
     "   - entry_point: The first node to execute\n"
     "   - For orchestrator patterns, the orchestrator agent should be the entry point. For sequential patterns, start with the logical first step. For router patterns, create edges from the router to ALL potential downstream targets.\n"
-    "   - Edges can be unconditional, or conditional via either (a) `logic` + `rules` (and/or combining field comparisons) or (b) `jsonlogic` (JSONLogic expression applied to the upstream structured_output). Use `jsonlogic` when you need nested/complex conditions.\n"
+    "   - Edges can be unconditional, or conditional via either (a) `logic` + `rules` (and/or combining field comparisons) or (b) `json_logic` (JSONLogic expression applied to the upstream structured_output). Use `json_logic` when you need nested/complex conditions.\n"
     "   - **Field source for conditions**: condition fields must come from the `structured_output` of the **from_node** (e.g., router/orchestrator output fields).\n"
     "   - **Supported JSONLogic ops** (if used): var, ==, !=, >, >=, <, <=, and, or, not/!, in, if, regex. Do not rely on other ops.\n"
     "   - At least one terminal node with **no outgoing edges** is REQUIRED. Final/report/sink nodes must not route back; leave them as terminals so output_schema can be derived.\n\n"
@@ -113,7 +113,7 @@ GRAPH_GENERATOR_USER_PROMPT = dedent(
     '      "rules": [\n'
     '        {{"field": "string (structured_output field name)", "op": "string (==, !=, >, >=, <, <=, in, not_in, contains, not_contains, startswith, endswith, regex, regex_not, between, is_true, is_false, exists, not_exists)", "value": "any"}}\n'
     '      ],\n'
-    '      "jsonlogic": {{ "and": [{{">=": [{{"var": "score"}}, 7]}}, {{"==": [{{"var": "flag"}}, true]}}] }} (optional, JSONLogic expression; takes precedence over rules; field paths come from source structured_output)\n'
+    '      "json_logic": {{ "and": [{{">=": [{{"var": "score"}}, 7]}}, {{"==": [{{"var": "flag"}}, true]}}] }} (optional, JSONLogic expression; takes precedence over rules; field paths come from source structured_output)\n'
     '    }}\n'
     '  ],\n'
     '  "entry_point": "string (name of the first node to execute)",\n'

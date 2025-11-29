@@ -1,5 +1,6 @@
 import re
 from typing import Optional, Dict, Any, cast, List, Callable
+
 from loguru import logger
 from strands.agent import AgentResult
 from strands.hooks import HookProvider
@@ -13,10 +14,9 @@ from app.common.domain.entity.agent_node_spec import AgentNode
 from app.common.domain.entity.function_node_spec import FunctionNode
 from app.common.domain.entity.graph_spec import GraphSpec, ConditionRule, Edge
 from app.common.domain.enums.agent_category import AgentCategory
-from app.common.domain.enums.session_manager_type import SessionManagerType
-from app.core.graph.graph_wrapper import GraphBuilderAdapter
 from app.core.factory.agent_factory import create_agent_by_agent_card
 from app.core.factory.tool_factory import ToolRouter
+from app.core.graph.graph_wrapper import GraphBuilderAdapter
 from app.core.nodes.function_node import FunctionNodeWrapper
 
 
@@ -109,8 +109,8 @@ class DynamicGraphBuilder:
             condition = None
 
             # 优先使用自定义规则/JSONLogic 条件
-            if edge.jsonlogic:
-                condition = self._create_jsonlogic_condition(edge, from_agent_spec)
+            if edge.json_logic:
+                condition = self._create_json_logic_condition(edge, from_agent_spec)
             elif edge.rules:
                 condition = self._create_rules_condition(edge, from_agent_spec)
             elif from_agent_spec and from_agent_spec.category == AgentCategory.ROUTER:
@@ -301,7 +301,7 @@ class DynamicGraphBuilder:
         return None
 
     @staticmethod
-    def _apply_jsonlogic(expr: Any, data: Dict[str, Any]) -> Any:
+    def _apply_json_logic(expr: Any, data: Dict[str, Any]) -> Any:
         """最小实现的 JSONLogic 解析，覆盖常用运算符"""
 
         def get_var(path: Any, default: Any = None) -> Any:
@@ -395,7 +395,7 @@ class DynamicGraphBuilder:
         return eval_expr(expr)
 
     @staticmethod
-    def _create_jsonlogic_condition(edge: Edge, from_agent_spec: Optional[AgentNode]) -> Callable[[GraphState], bool]:
+    def _create_json_logic_condition(edge: Edge, from_agent_spec: Optional[AgentNode]) -> Callable[[GraphState], bool]:
         """使用 JSONLogic 表达式创建条件函数"""
 
         def condition(state: GraphState) -> bool:
@@ -429,15 +429,15 @@ class DynamicGraphBuilder:
                 return False
 
             try:
-                decision = bool(DynamicGraphBuilder._apply_jsonlogic(edge.jsonlogic, output))
+                decision = bool(DynamicGraphBuilder._apply_json_logic(edge.json_logic, output))
                 if decision:
                     logger.debug(
-                        f"JSONLogic 命中，from='{edge.from_node}' -> to='{edge.to_node}', expr={edge.jsonlogic}"
+                        f"JSONLogic 命中，from='{edge.from_node}' -> to='{edge.to_node}', expr={edge.json_logic}"
                     )
                 return decision
             except Exception as exc:
                 logger.warning(
-                    f"JSONLogic 计算失败: expr={edge.jsonlogic}, output={output}",
+                    f"JSONLogic 计算失败: expr={edge.json_logic}, output={output}",
                     exc_info=exc
                 )
                 return False

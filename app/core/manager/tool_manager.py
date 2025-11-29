@@ -15,13 +15,14 @@ tool_factory.include_router(math_router)
 def load_strands_tools():
     try:
         from strands.tools.loader import load_tools_from_module
-        from strands_tools import file_read, image_reader, editor, file_write
+        from strands_tools import file_read, image_reader, editor, file_write, diagram
 
         modules = {
             "file_read": file_read,
             "image_reader": image_reader,
             "editor": editor,
             "file_write": file_write,
+            "diagram": diagram
         }
 
         for module_name, module in modules.items():

@@ -46,5 +46,3 @@ class WebhookSpec(BaseModel):
             "对应 GraphExecuteData.json 的 keys"
         )
     )
-
-

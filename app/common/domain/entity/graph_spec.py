@@ -31,11 +31,10 @@ class Edge(BaseModel):
         default=None,
         description="可选的条件规则列表，用于决定是否穿越该边"
     )
-    jsonlogic: Optional[Dict[str, Any]] = Field(
+    json_logic: Optional[Dict[str, Any]] = Field(
         default=None,
         description="可选的 JSONLogic 表达式，优先于 rules。参考 https://jsonlogic.com/ 规范"
     )
-
 
 
 class GraphSpec(BaseModel):

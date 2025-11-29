@@ -248,7 +248,7 @@ class BaseStreamHandler(metaclass=abc.ABCMeta):
                 )
             )
 
-    async def run_streamed(self,async_generator: AsyncIterator[Any],):
+    async def run_streamed(self, async_generator: AsyncIterator[Any], ):
         try:
             self.stream_task = asyncio.create_task(self.start_streaming(async_generator))
         except Exception as e:

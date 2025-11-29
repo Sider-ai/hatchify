@@ -7,8 +7,7 @@ from sqlalchemy import (
     String,
     DateTime,
     func,
-    Enum, Integer,
-)
+    Enum, )
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.business.db.base import Base

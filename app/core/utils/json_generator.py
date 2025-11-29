@@ -92,7 +92,6 @@ async def json_generator(
     if not return_usage:
         return result, usage
 
-
     raw_response: ModelResponse = getattr(result, "_raw_response", None)
     if raw_response is not None:
         usage: Usage = getattr(raw_response, "usage", None)

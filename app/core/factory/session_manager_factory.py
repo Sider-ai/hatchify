@@ -26,7 +26,6 @@ class BinarySafeFileSessionManager(FileSessionManager):
             with cls._loop_lock:
 
                 if cls._loop is None:
-
                     new_loop = asyncio.new_event_loop()
 
                     def run_loop():

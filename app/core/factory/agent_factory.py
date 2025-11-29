@@ -8,6 +8,7 @@ from app.common.domain.entity.agent_card import AgentCard
 from app.core.factory.llm_factory import create_llm_by_agent_card
 from app.core.manager.tool_manager import tool_factory
 
+
 def create_agent_by_agent_card(
         agent_card: AgentCard,
         structured_output_model: Optional[Type[BaseModel]] = None,

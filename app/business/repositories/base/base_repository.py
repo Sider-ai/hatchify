@@ -68,6 +68,7 @@ class BaseRepository(Generic[T], metaclass=abc.ABCMeta):
             entity_ids: Iterable[Any],
     ) -> bool:
         ...
+
     async def paginate(
             self,
             session: AsyncSession,

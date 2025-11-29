@@ -10,4 +10,3 @@ class FunctionNode(BaseModel):
         ...,
         description="Function 类型（从 function_manager 查找对应的 @tool 函数名）"
     )
-

@@ -2,11 +2,8 @@ from __future__ import annotations
 
 from typing import List, Optional
 
-from litellm import provider_list, LITELLM_CHAT_PROVIDERS
-from litellm.types.utils import LlmProviders
+from litellm import LITELLM_CHAT_PROVIDERS
 from pydantic import BaseModel, Field
-
-
 
 
 class ModelCard(BaseModel):
@@ -52,4 +49,3 @@ class ProviderCard(BaseModel):
                     f"does not match its parent provider '{self.id}'"
                 )
             m.provider_id = self.id
-
