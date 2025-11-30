@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, cast
 
 from fastapi import APIRouter, Depends, Path
 from fastapi_pagination import Page
@@ -35,6 +35,26 @@ async def get_by_id(
             )
         response = MessageResponse.model_validate(obj_tb)
         return Result.ok(data=response)
+    except Exception as e:
+        msg = f"{type(e).__name__}: {str(e)}"
+        logger.error(msg)
+        return Result.failed(code=500, message=msg)
+
+
+@messages_router.get("/history/{session_id}", response_model=Result[List[MessageResponse]])
+async def history(
+        session_id: str = Path(default=..., description="会话 ID"),
+        session: AsyncSession = Depends(get_db),
+        service: MessageService = Depends(ServiceManager.get_service_dependency(MessageService)),
+):
+    try:
+        history_list: List[MessageTable] = cast(List[MessageTable], await service.get_list(
+            session,
+            sort="created_at:asc",
+            session_id=session_id,
+        ))
+        data = [MessageResponse.model_validate(item) for item in history_list]
+        return Result.ok(data=data)
     except Exception as e:
         msg = f"{type(e).__name__}: {str(e)}"
         logger.error(msg)

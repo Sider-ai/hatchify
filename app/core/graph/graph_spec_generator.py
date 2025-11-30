@@ -5,9 +5,10 @@ from litellm.types.completion import ChatCompletionSystemMessageParam, \
     ChatCompletionUserMessageParam, ChatCompletionMessageParam
 from litellm.types.utils import Usage
 from loguru import logger
+from sqlalchemy.ext.asyncio import AsyncSession
 from strands.models.litellm import LiteLLMModel
 from strands.tools.decorator import DecoratedFunctionTool
-from strands.types.content import ContentBlock, Role
+from strands.types.content import ContentBlock, Role, Messages
 
 from app.business.db.session import transaction, AsyncSessionLocal
 from app.business.manager.repository_manager import RepositoryManager
@@ -26,6 +27,7 @@ from app.common.domain.requests.graph import ConversationRequest
 from app.common.domain.structured_output.graph_generation_output import (
     GraphArchitectureOutput,
     SchemaExtractionOutput,
+    GraphMetadataOutput,
 )
 from app.common.event.base_event import StreamEvent, ResultEvent
 from app.common.event.edit_event import PhaseEvent
@@ -62,6 +64,45 @@ class GraphSpecGenerator(BaseStreamHandler):
 
         self.spec_gen_config = settings.models.spec_generator
         self.spec_ext_config = settings.models.spec_generator
+
+    @staticmethod
+    def _build_genesis_prompt(request_messages: Messages) -> str:
+        segments: List[str] = []
+        for msg in request_messages:
+            for content in msg.get("content", []) or []:
+                text = content.get("text")
+                if text:
+                    segments.append(str(text))
+        return "\n\n".join(segments).strip()
+
+    async def _generate_graph_metadata(
+            self,
+            genesis_prompt: str,
+    ) -> Optional[GraphMetadataOutput]:
+        """通过额外 LLM 生成 Graph 名称与描述"""
+        if not genesis_prompt:
+            return None
+        try:
+            meta, _ = await json_generator(
+                provider_id=self.spec_gen_config.provider,
+                model_id=self.spec_gen_config.model,
+                messages=[
+                    ChatCompletionSystemMessageParam(
+                        role="system",
+                        content=GRAPH_GENERATOR_SYSTEM_PROMPT
+                    ),
+                    ChatCompletionUserMessageParam(
+                        role="user",
+                        content=GRAPH_GENERATOR_USER_PROMPT.format(genesis_prompt=genesis_prompt)
+                    )
+                ],
+                response_model=GraphMetadataOutput,
+                max_retries=2,
+            )
+            return meta
+        except Exception as e:
+            logger.warning(f"Generate graph metadata failed: {e}")
+            return None
 
     async def _generate_graph_architecture(
             self,
@@ -308,6 +349,26 @@ class GraphSpecGenerator(BaseStreamHandler):
         async_generator = self.conversation(session_id, request)
         await self.run_streamed(async_generator)
 
+    async def create_graph_table(
+            self,
+            session_id: str,
+            messages: Messages,
+            session: AsyncSession,
+            graph_service: GraphService,
+    ):
+        genesis_prompt = self._build_genesis_prompt(messages)
+        graph_meta: Optional[GraphMetadataOutput] = await self._generate_graph_metadata(genesis_prompt)
+        graph_obj = await graph_service.create(
+            session,
+            {
+                "name": graph_meta.name if graph_meta else f"graph_{session_id}",
+                "description": graph_meta.description if graph_meta and graph_meta.description else "Auto generated from conversation",
+                "current_spec": {},
+            },
+            commit=False,
+        )
+        return graph_obj
+
     async def conversation(
             self,
             session_id: str,
@@ -337,14 +398,11 @@ class GraphSpecGenerator(BaseStreamHandler):
                 session_obj = await session_repo.find_by_id(session, session_id)
                 # create session and graph table
                 if not session_obj:
-                    graph_obj = await graph_service.create(
-                        session,
-                        {
-                            "name": f"graph_{session_id}",
-                            "description": "Auto generated from conversation",
-                            "current_spec": {},
-                        },
-                        commit=False,
+                    graph_obj = await self.create_graph_table(
+                        session_id=session_id,
+                        messages=request.messages,
+                        session=session,
+                        graph_service=graph_service,
                     )
                     session_obj = SessionTable(
                         id=session_id,
@@ -355,14 +413,11 @@ class GraphSpecGenerator(BaseStreamHandler):
                 else:
                     graph_obj = await graph_service.get_by_id(session, cast(str, session_obj.graph_id))
                     if not graph_obj:
-                        graph_obj = await graph_service.create(
-                            session,
-                            {
-                                "name": f"graph_{session_obj.graph_id}_recreated",
-                                "description": "Recreated for missing graph",
-                                "current_spec": {},
-                            },
-                            commit=False,
+                        graph_obj = await self.create_graph_table(
+                            session_id=session_id,
+                            messages=request.messages,
+                            session=session,
+                            graph_service=graph_service,
                         )
                         await session_repo.update_by_id(
                             session,
@@ -410,8 +465,6 @@ class GraphSpecGenerator(BaseStreamHandler):
 
                 if request.mode == ConversationMode.EDIT:
                     update_data: Dict[str, Any] = {
-                        "name": graph_spec.name,
-                        "description": graph_spec.description,
                         "current_spec": graph_spec.model_dump(exclude_none=True),
                     }
                     await graph_service.update_by_id(

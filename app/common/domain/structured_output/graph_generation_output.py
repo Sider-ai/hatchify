@@ -73,6 +73,15 @@ class GraphArchitectureOutput(BaseModel):
     )
 
 
+class GraphMetadataOutput(BaseModel):
+    """Graph 元信息输出（name + description）"""
+    name: str = Field(..., description="2-5 个词的 Graph 名称")
+    description: str = Field(
+        ...,
+        description="简短描述（1-2 句，说明 Graph 做什么）"
+    )
+
+
 # ============================================================
 # Step 2: Schema 提取的输出
 # ============================================================

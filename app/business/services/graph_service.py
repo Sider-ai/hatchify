@@ -18,6 +18,9 @@ from app.business.repositories.session_repository import SessionRepository
 from app.business.services.base.generic_service import GenericService
 from app.common.domain.entity.graph_spec import GraphSpec
 from app.common.domain.enums.graph_version_type import GraphVersionType
+from app.core.graph.dynamic_graph_builder import DynamicGraphBuilder
+from app.core.manager.function_manager import function_router
+from app.core.manager.tool_manager import tool_factory
 
 document_formats = get_args(DocumentFormat)
 image_formats = get_args(ImageFormat)
@@ -205,7 +208,8 @@ class GraphService(GenericService[GraphTable]):
         try:
             # 如果更新了 spec，则标记为有未保存修改
             if "spec" in update_data:
-                update_data["current_spec"] = update_data.pop("spec")
+                validated_spec = self._validate_spec(update_data.pop("spec"))
+                update_data["current_spec"] = validated_spec
                 update_data["current_version_id"] = None
 
             result = await self._repository.update_by_id(session, entity_id, update_data)
@@ -220,6 +224,17 @@ class GraphService(GenericService[GraphTable]):
             if commit:
                 await session.rollback()
             raise
+
+    @staticmethod
+    def _validate_spec(spec_data: dict) -> dict:
+        spec_model = GraphSpec.model_validate(spec_data)
+        builder = DynamicGraphBuilder(
+            tool_router=tool_factory,
+            function_router=function_router,
+        )
+        builder.build_graph(spec_model)
+
+        return spec_model.model_dump(exclude_none=True)
 
     async def create_snapshot(
             self,

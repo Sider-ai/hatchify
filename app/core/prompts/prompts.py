@@ -1,5 +1,18 @@
 from textwrap import dedent
 
+GRAPH_NAME_SYSTEM_PROMPT = dedent(
+    "You are a helpful assistant that generates concise, descriptive names for workflows. "
+    "Generate a name that is 2-5 words long, descriptive, and easy to understand. "
+    "Also craft a brief description (1-2 sentences) that explains what the workflow does. "
+    "Always respond with JSON: {\"name\": \"...\", \"description\": \"...\"}."
+)
+
+GRAPH_NAME_USER_PROMPT = dedent(
+    "Based on this workflow description, generate a short name (2-5 words) and a concise description:\n\n"
+    "{genesis_prompt}\n\n"
+    "Respond ONLY with JSON using keys \"name\" and \"description\"."
+)
+
 # 第一步：生成 Graph 架构
 GRAPH_GENERATOR_SYSTEM_PROMPT = dedent(
     "You are a 'Graph Architect' AI. You will design a complete Graph workflow by providing a single, valid JSON object and nothing else. "

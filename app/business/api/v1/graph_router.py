@@ -111,6 +111,10 @@ async def update_by_id(
             return Result.failed(code=500, message="Update Graph Failed")
         response = GraphResponse.model_validate(obj_tb)
         return Result.ok(data=response)
+    except ValueError as e:
+        msg = str(e)
+        logger.error(msg)
+        return Result.failed(code=400, message=msg)
     except Exception as e:
         msg = f"{type(e).__name__}: {str(e)}"
         logger.error(msg)
