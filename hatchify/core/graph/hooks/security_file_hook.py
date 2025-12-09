@@ -91,6 +91,10 @@ class SecurityFileHook(HookProvider):
                         event.cancel_tool = result.error
                         return
 
+                    # 替换为规范化后的路径
+                    event.tool_use["input"]["path"] = result.normalized_path
+                    logger.debug(f"✅ Path normalized: {path} -> {result.normalized_path}")
+
                 case "image_reader":
                     path = cast(str, event.tool_use.get("input", {}).get("image_path"))
                     result = self.validate_file_path(path)
@@ -98,6 +102,10 @@ class SecurityFileHook(HookProvider):
                     if not result.is_valid:
                         event.cancel_tool = result.error
                         return
+
+                    # 替换为规范化后的路径
+                    event.tool_use["input"]["image_path"] = result.normalized_path
+                    logger.debug(f"✅ Image path normalized: {path} -> {result.normalized_path}")
 
                 case "editor":
                     path = cast(str, event.tool_use.get("input", {}).get("path"))
@@ -107,6 +115,10 @@ class SecurityFileHook(HookProvider):
                         event.cancel_tool = result.error
                         return
 
+                    # 替换为规范化后的路径
+                    event.tool_use["input"]["path"] = result.normalized_path
+                    logger.debug(f"✅ Editor path normalized: {path} -> {result.normalized_path}")
+
                 case "file_write":
                     path = cast(str, event.tool_use.get("input", {}).get("path"))
                     result = self.validate_file_path(path)
@@ -114,6 +126,10 @@ class SecurityFileHook(HookProvider):
                     if not result.is_valid:
                         event.cancel_tool = result.error
                         return
+
+                    # 替换为规范化后的路径
+                    event.tool_use["input"]["path"] = result.normalized_path
+                    logger.debug(f"✅ Write path normalized: {path} -> {result.normalized_path}")
 
 
                 case "shell":
@@ -128,6 +144,11 @@ class SecurityFileHook(HookProvider):
                         event.cancel_tool = result.error
                         return
 
+                    # 🔑 替换 work_dir 为规范化路径
+                    if work_dir and result.normalized_path:
+                        event.tool_use["input"]["work_dir"] = result.normalized_path
+                        logger.debug(f"✅ Shell work_dir normalized: {work_dir} -> {result.normalized_path}")
+
                 case _:
                     raise ValueError(f"Unknown tool: {event.selected_tool.tool_name}")
 
@@ -141,7 +162,15 @@ class SecurityFileHook(HookProvider):
         1. 单个命令字符串: "ls -la"
         2. 命令字符串数组: ["cd /path", "git status"]
         3. 命令对象数组: [{"command": "git clone repo", "work_dir": "/path"}]
+
+        Returns:
+            ValidationResult with:
+            - is_valid: 命令是否安全
+            - normalized_path: 规范化后的 work_dir（如果提供）
+            - error: 错误信息（如果验证失败）
         """
+        normalized_work_dir = None
+
         if work_dir:
             result = self.validate_file_path(work_dir, strict_mode=True)
             if not result.is_valid:
@@ -151,6 +180,7 @@ class SecurityFileHook(HookProvider):
                     error=f"Invalid work_dir: {result.error}"
                 )
             cwd = result.normalized_path
+            normalized_work_dir = result.normalized_path  # 🔑 保存规范化的 work_dir
         else:
             cwd = self.workspace
 
@@ -164,7 +194,7 @@ class SecurityFileHook(HookProvider):
                 is_valid, error = self.validate_commands(split_commands, cwd)
                 return ValidationResult(
                     is_valid=is_valid,
-                    normalized_path=None,
+                    normalized_path=normalized_work_dir,  # 🔑 返回规范化的 work_dir
                     error=error
                 )
 
@@ -298,9 +328,6 @@ class SecurityFileHook(HookProvider):
             # Unix 系统上这不影响安全性，因为 realpath 已经规范化了路径
             is_windows = os.name == 'nt'
             compare_path = absolute_path.lower() if is_windows else absolute_path
-
-            # 🔒 安全审计：记录所有路径访问
-            logger.debug(f"Path validation: {path} -> {absolute_path} (strict={strict_mode}, os={os.name})")
 
             # 1. 黑名单检查：敏感路径（所有模式都检查）
             # 注意：self.sensitive_paths 已经在 __init__ 中使用 realpath 规范化
@@ -617,11 +644,13 @@ class SecurityFileHook(HookProvider):
         验证命令的完整逻辑（组合函数）
 
 
-        增强：检查所有命令中的路径参数，防止通过 Bash 绕过文件工具的安全检查
+        增强：
+        1. 检查所有命令中的路径参数，防止通过 Bash 绕过文件工具的安全检查
+        2. 追踪 cd 命令导致的工作目录变化，正确验证命令链
 
         Args:
             commands: 分割后的命令列表
-            cwd: 当前工作目录
+            cwd: 初始工作目录
 
         Returns:
             (is_valid, error_message) 元组
@@ -630,6 +659,9 @@ class SecurityFileHook(HookProvider):
         is_valid, error = self.validate_command_safety(commands)
         if not is_valid:
             return False, error
+
+        # 🔑 追踪当前工作目录（会随 cd 命令更新）
+        current_cwd = cwd
 
         # 2. 检查所有命令的路径参数
         for cmd in commands:
@@ -656,16 +688,34 @@ class SecurityFileHook(HookProvider):
                 if not target_dir or not target_dir.strip():
                     return False, "cd target directory cannot be empty"
 
+                # 🔑 使用当前追踪的 cwd 来验证
                 is_valid, error = self.validate_cd_path(
                     target_dir,
-                    cwd
+                    current_cwd  # ← 使用动态更新的 cwd
                 )
                 if not is_valid:
                     return False, error
 
+                # 🔑 更新 current_cwd（模拟 cd 的效果）
+                expanded_dir = self.expand_path_for_tilde(target_dir)
+                if os.path.isabs(expanded_dir):
+                    new_cwd = expanded_dir
+                else:
+                    new_cwd = os.path.abspath(os.path.join(current_cwd, expanded_dir))
+
+                # 验证并规范化新 cwd（确保路径安全且获得真实路径）
+                result = self.validate_file_path(new_cwd, strict_mode=True)
+                if result.is_valid:
+                    current_cwd = result.normalized_path
+                    logger.debug(f"📂 CWD updated by cd: {current_cwd}")
+                else:
+                    # 理论上不应该到这里，因为 validate_cd_path 已经验证过
+                    return False, f"Invalid cd target: {result.error}"
+
             # 2.2 🔑 检查所有命令的路径参数（轻量模式：仅黑名单）
             # 防止用 cat/echo/rm 等绕过文件工具的安全检查
-            is_valid, error = self.validate_command_paths(cmd, cwd)
+            # 使用更新后的 current_cwd
+            is_valid, error = self.validate_command_paths(cmd, current_cwd)
             if not is_valid:
                 return False, error
 

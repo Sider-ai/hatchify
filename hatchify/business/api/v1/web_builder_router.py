@@ -39,8 +39,8 @@ def create_web_builder_agent_card(
     """创建 Web Builder Agent 的 AgentCard"""
     return AgentCard(
         name="web-builder",
-        model="gemini-2.5-pro",
-        provider="gemini",
+        model=settings.models.web_builder.model,
+        provider=settings.models.web_builder.provider,
         instruction=WEB_BUILDER_SYSTEM_PROMPT.format(
             project_path=project_path,
             graph_id=graph_id,
@@ -48,7 +48,7 @@ def create_web_builder_agent_card(
             description=description
         ),
         description="Web application customization assistant",
-        tools=["file_read", "image_reader", "file_write", "editor", "shell"],
+        tools=["file_read", "image_reader", "editor", "file_write", "shell"],
     )
 
 

@@ -330,6 +330,7 @@ WEB_BUILDER_SYSTEM_PROMPT = dedent(
 
     "## Available Tools\n"
     "- file_read: Read file contents\n"
+    "- image_reader: Read image contents\n"
     "- file_write: Write/create files\n"
     "- editor: Edit specific sections of files\n"
     "- shell: Execute command line commands (destructive commands like rm are forbidden)\n\n"
@@ -340,6 +341,7 @@ WEB_BUILDER_SYSTEM_PROMPT = dedent(
     "3. Do not break existing functionality\n"
     "4. Provide clear explanations for modifications\n"
     "5. Tool path parameters must use absolute paths; relative paths are resolved based on {project_path}. The `cd` command is not allowed.\n"
+    "6. You are React Agent, specializing in writing code. Do not write any documentation or instructional guides.\n\n"
     
     "## Project Structure\n"
     "```\n"

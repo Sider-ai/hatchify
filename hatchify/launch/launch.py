@@ -21,6 +21,7 @@ from hatchify.business.api.v1.session_router import sessions_router
 from hatchify.business.api.v1.tool_router import tool_router
 from hatchify.business.api.v1.web_builder_router import web_builder_router
 from hatchify.business.api.v1.web_hook_router import web_hook_router
+from hatchify.business.db.session import init_db
 from hatchify.common.domain.result.result import Result
 from hatchify.common.extensions.ext_storage import init_storage
 from hatchify.common.settings.settings import get_hatchify_settings
@@ -30,6 +31,8 @@ hatchify_settings = get_hatchify_settings()
 
 
 async def initialize_extensions():
+    await init_db()
+
     await asyncio.gather(
         async_load_mcp_server(),
         async_load_strands_tools(),

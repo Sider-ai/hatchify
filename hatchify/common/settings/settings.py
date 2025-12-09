@@ -59,6 +59,10 @@ class ProviderSettings(BaseSettings):
 
 class ModelSettings(BaseSettings):
     """不同用途的模型配置"""
+    web_builder: ProviderSettings = Field(
+        ...,
+        description="Web构建者的模型"
+    )
     spec_generator: ProviderSettings = Field(
         ...,
         description="用于生成 GraphSpec 架构的模型"
