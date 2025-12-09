@@ -17,6 +17,7 @@ from starlette.responses import JSONResponse
 from hatchify.business.api.v1.graph_router import graphs_router
 from hatchify.business.api.v1.graph_version_router import graph_versions_router
 from hatchify.business.api.v1.message_router import messages_router
+from hatchify.business.api.v1.models_router import model_router
 from hatchify.business.api.v1.session_router import sessions_router
 from hatchify.business.api.v1.tool_router import tool_router
 from hatchify.business.api.v1.web_builder_router import web_builder_router
@@ -93,3 +94,4 @@ app.include_router(messages_router, tags=["messages"])
 app.include_router(sessions_router, tags=["sessions"])
 app.include_router(web_builder_router, tags=["web_builder"])
 app.include_router(tool_router, tags=["tools"])
+app.include_router(model_router, tags=["models"])

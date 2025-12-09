@@ -6,10 +6,10 @@ from hatchify.common.domain.responses.tool_response import ToolResponse
 from hatchify.common.domain.result.result import Result
 from hatchify.core.manager.tool_manager import tool_factory
 
-tool_router = APIRouter()
+tool_router = APIRouter(prefix="/tools")
 
 
-@tool_router.get("/tools")
+@tool_router.get("/all")
 async def all_tools() -> Result[List[ToolResponse]]:
     try:
         return Result.ok(
