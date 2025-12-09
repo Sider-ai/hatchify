@@ -11,6 +11,7 @@ from hatchify.business.db.session import get_db
 from hatchify.business.manager.service_manager import ServiceManager
 from hatchify.business.models.graph import GraphTable
 from hatchify.business.services.graph_service import GraphService
+from hatchify.business.services.session_service import SessionService
 from hatchify.business.utils.pagination_utils import CustomParams
 from hatchify.business.utils.sse_helper import create_sse_response
 from hatchify.common.domain.requests.graph import (
@@ -41,6 +42,27 @@ async def get_by_id(
 ):
     try:
         obj_tb: GraphTable = await service.get_by_id(session, _id)
+        if not obj_tb:
+            return Result.error(code=404, message="Source Not Found")
+        response = GraphResponse.model_validate(obj_tb)
+        return Result.ok(data=response)
+    except Exception as e:
+        msg = f"{type(e).__name__}: {str(e)}"
+        logger.error(msg)
+        return Result.error(code=500, message=msg)
+
+@graphs_router.get("/get_by_session_id/{session_id}", response_model=Result[GraphResponse])
+async def get_by_id(
+        session_id: str = Path(default=...),
+        session: AsyncSession = Depends(get_db),
+        service: GraphService = Depends(ServiceManager.get_service_dependency(GraphService)),
+        session_service: SessionService = Depends(ServiceManager.get_service_dependency(SessionService)),
+):
+    try:
+        session_obj = await session_service.get_by_id(session, session_id)
+        if not session_obj:
+            return Result.error(code=404, message="Source Not Found")
+        obj_tb: GraphTable = await service.get_by_id(session, session_obj.graph_id)
         if not obj_tb:
             return Result.error(code=404, message="Source Not Found")
         response = GraphResponse.model_validate(obj_tb)
