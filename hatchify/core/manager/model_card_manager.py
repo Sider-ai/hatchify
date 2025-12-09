@@ -152,5 +152,5 @@ class ModelCardManager(BaseModel):
 
 
 model_card_manager: ModelCardManager = ModelCardManager.parse_toml(
-    Constants.Path.MODELS_TOML
+    Constants.Path.ModelPath
 )

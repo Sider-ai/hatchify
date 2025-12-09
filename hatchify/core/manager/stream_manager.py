@@ -11,7 +11,7 @@ from typing import Dict, Optional
 
 from loguru import logger
 
-from hatchify.core.graph.stream_handler import BaseStreamHandler
+from hatchify.core.stream_handler.stream_handler import BaseStreamHandler
 
 
 class StreamManager:

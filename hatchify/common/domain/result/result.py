@@ -18,5 +18,5 @@ class Result[T](BaseModel):
         return cls(code=code, message=message, data=data)
 
     @classmethod
-    def failed(cls, code: int = 500, message: str = "Internal Server Error"):
+    def error(cls, code: int = 500, message: str = "Internal Server Error"):
         return cls(code=code, message=message)

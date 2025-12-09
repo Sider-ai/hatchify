@@ -17,7 +17,7 @@ from hatchify.common.domain.enums.agent_category import AgentCategory
 from hatchify.core.factory.agent_factory import create_agent_by_agent_card
 from hatchify.core.factory.tool_factory import ToolRouter
 from hatchify.core.graph.graph_wrapper import GraphBuilderAdapter
-from hatchify.core.nodes.function_node import FunctionNodeWrapper
+from hatchify.core.graph.nodes.function_node import FunctionNodeWrapper
 
 
 class DynamicGraphBuilder:

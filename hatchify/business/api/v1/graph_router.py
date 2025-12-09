@@ -1,7 +1,7 @@
 import uuid
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, Path, Header, Query, HTTPException
+from fastapi import APIRouter, Depends, Path, Header, Query
 from fastapi_pagination import Page
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,10 +12,11 @@ from hatchify.business.manager.service_manager import ServiceManager
 from hatchify.business.models.graph import GraphTable
 from hatchify.business.services.graph_service import GraphService
 from hatchify.business.utils.pagination_utils import CustomParams
+from hatchify.business.utils.sse_helper import create_sse_response
 from hatchify.common.domain.requests.graph import (
     PageGraphRequest,
     UpdateGraphRequest,
-    ConversationRequest,
+    GraphConversationRequest,
 )
 from hatchify.common.domain.responses.graph_response import GraphResponse
 from hatchify.common.domain.responses.graph_rollback_response import GraphRollbackResponse
@@ -23,11 +24,11 @@ from hatchify.common.domain.responses.graph_version_response import GraphVersion
 from hatchify.common.domain.responses.pagination import PaginationInfo
 from hatchify.common.domain.responses.web_hook import ExecutionResponse
 from hatchify.common.domain.result.result import Result
-from hatchify.core.graph.graph_spec_generator import GraphSpecGenerator
-from hatchify.core.manager.executor_manager import StreamManager
 from hatchify.core.manager.function_manager import function_router
 from hatchify.core.manager.model_card_manager import model_card_manager
+from hatchify.core.manager.stream_manager import StreamManager
 from hatchify.core.manager.tool_manager import tool_factory
+from hatchify.core.stream_handler.graph_spec_generator import GraphSpecGenerator
 
 graphs_router = APIRouter(prefix="/graphs")
 
@@ -41,16 +42,13 @@ async def get_by_id(
     try:
         obj_tb: GraphTable = await service.get_by_id(session, _id)
         if not obj_tb:
-            return Result.failed(
-                code=404,
-                message="Source Not Found",
-            )
+            return Result.error(code=404, message="Source Not Found")
         response = GraphResponse.model_validate(obj_tb)
         return Result.ok(data=response)
     except Exception as e:
         msg = f"{type(e).__name__}: {str(e)}"
         logger.error(msg)
-        return Result.failed(code=500, message=msg)
+        return Result.error(code=500, message=msg)
 
 
 @graphs_router.get("/page", response_model=Result[PaginationInfo[List[GraphResponse]]])
@@ -71,7 +69,7 @@ async def page(
     except Exception as e:
         msg = f"{type(e).__name__}: {str(e)}"
         logger.error(msg)
-        return Result.failed(code=500, message=msg)
+        return Result.error(code=500, message=msg)
 
 
 @graphs_router.delete("/delete_by_id/{id}", response_model=Result[bool])
@@ -83,12 +81,12 @@ async def delete_by_id(
     try:
         is_deleted: bool = await service.delete_by_id(session, _id)
         if not is_deleted:
-            return Result.failed(code=500, message="Delete Source Failed")
+            return Result.error(code=500, message="Delete Source Failed")
         return Result.ok(data=is_deleted)
     except Exception as e:
         msg = f"{type(e).__name__}: {str(e)}"
         logger.error(msg)
-        return Result.failed(code=500, message=msg)
+        return Result.error(code=500, message=msg)
 
 
 @graphs_router.put("/update_by_id/{id}", response_model=Result[GraphResponse])
@@ -108,17 +106,17 @@ async def update_by_id(
         update_data = update_request.model_dump(exclude_defaults=True, exclude_none=True)
         obj_tb: GraphTable = await service.update_by_id(session, _id, update_data)
         if not obj_tb:
-            return Result.failed(code=500, message="Update Graph Failed")
+            return Result.error(code=500, message="Update Graph Failed")
         response = GraphResponse.model_validate(obj_tb)
         return Result.ok(data=response)
     except ValueError as e:
         msg = str(e)
         logger.error(msg)
-        return Result.failed(code=400, message=msg)
+        return Result.error(code=400, message=msg)
     except Exception as e:
         msg = f"{type(e).__name__}: {str(e)}"
         logger.error(msg)
-        return Result.failed(code=500, message=msg)
+        return Result.error(code=500, message=msg)
 
 
 @graphs_router.post("/{id}/snapshot", response_model=Result[GraphVersionResponse])
@@ -135,7 +133,7 @@ async def create_snapshot(
     except Exception as e:
         msg = f"{type(e).__name__}: {str(e)}"
         logger.error(msg)
-        return Result.failed(code=500, message=msg)
+        return Result.error(code=500, message=msg)
 
 
 @graphs_router.post("/{id}/rollback/{version_id}", response_model=Result[GraphRollbackResponse])
@@ -156,13 +154,13 @@ async def rollback_to_version(
     except Exception as e:
         msg = f"{type(e).__name__}: {str(e)}"
         logger.error(msg)
-        return Result.failed(code=500, message=msg)
+        return Result.error(code=500, message=msg)
 
 
-@graphs_router.post("/conversation/{session_id}", response_model=Result[ExecutionResponse])
+@graphs_router.post("/stream", response_model=Result[ExecutionResponse])
 async def submit_stream_conversation(
-        request: ConversationRequest,
-        session_id: str = Path(...),
+        request: GraphConversationRequest,
+        session_id: Optional[str] = Query(default=uuid.uuid4().hex)
 ):
     execution_id = uuid.uuid4().hex
     try:
@@ -174,39 +172,32 @@ async def submit_stream_conversation(
         )
         await StreamManager.create(execution_id, generator)
         await generator.submit_task(session_id=session_id, request=request)
-        return Result.ok(data=ExecutionResponse(graph_id=session_id, execution_id=execution_id))
+        return Result.ok(data=ExecutionResponse(session_id=session_id, execution_id=execution_id))
     except Exception as e:
         msg = f"{type(e).__name__}: {e}"
         logger.error(msg)
-        return Result.failed(message=msg)
+        return Result.error(message=msg)
 
 
-@graphs_router.get("/conversation/stream/{execution_id}")
+@graphs_router.get("/stream/{execution_id}")
 async def stream_conversation(
         execution_id: str = Path(...),
         last_event_id: Optional[str] = Header(default=None, alias="Last-Event-ID"),
         latest_event_id: Optional[str] = Query(default=None),
 ):
-    executor = await StreamManager.get(execution_id)
-    if not executor:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Execution '{execution_id}' not found. It may have expired or been cleaned up."
-        )
+    """
+    获取 Graph 对话的流式响应
 
-    effective_last_id = latest_event_id or last_event_id
-    try:
-        return StreamingResponse(
-            executor.worker(last_event_id=effective_last_id),
-            media_type="text/event-stream",
-            headers={
-                "Cache-Control": "no-cache, no-transform",
-                "Connection": "keep-alive",
-                "X-Accel-Buffering": "no",
-                "Access-Control-Allow-Origin": "*"
-            }
-        )
-    except Exception as e:
-        msg = f"{type(e).__name__}: {e}"
-        logger.error(f"Stream error for execution {execution_id}: {msg}")
-        raise HTTPException(status_code=500, detail=msg)
+    Args:
+        execution_id: 执行 ID（从 submit_stream_conversation 返回）
+        last_event_id: SSE 重连时的最后一个事件 ID（从 Header）
+        latest_event_id: SSE 重连时的最后一个事件 ID（从 Query，优先级更高）
+
+    Returns:
+        StreamingResponse: SSE 流式响应
+    """
+    return await create_sse_response(
+        execution_id=execution_id,
+        last_event_id=last_event_id,
+        latest_event_id=latest_event_id
+    )

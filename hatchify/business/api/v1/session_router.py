@@ -29,16 +29,13 @@ async def get_by_id(
     try:
         obj_tb: SessionTable = await service.get_by_id(session, _id)
         if not obj_tb:
-            return Result.failed(
-                code=404,
-                message="Session Not Found",
-            )
+            return Result.error(code=404, message="Session Not Found")
         response = SessionResponse.model_validate(obj_tb)
         return Result.ok(data=response)
     except Exception as e:
         msg = f"{type(e).__name__}: {str(e)}"
         logger.error(msg)
-        return Result.failed(code=500, message=msg)
+        return Result.error(code=500, message=msg)
 
 
 @sessions_router.get("/page", response_model=Result[PaginationInfo[List[SessionResponse]]])
@@ -66,7 +63,7 @@ async def page(
     except Exception as e:
         msg = f"{type(e).__name__}: {str(e)}"
         logger.error(msg)
-        return Result.failed(code=500, message=msg)
+        return Result.error(code=500, message=msg)
 
 
 @sessions_router.delete("/delete_by_id/{id}", response_model=Result[bool])
@@ -78,9 +75,9 @@ async def delete_by_id(
     try:
         is_deleted: bool = await service.delete_by_id(session, _id)
         if not is_deleted:
-            return Result.failed(code=500, message="Delete Session Failed")
+            return Result.error(code=500, message="Delete Session Failed")
         return Result.ok(data=is_deleted)
     except Exception as e:
         msg = f"{type(e).__name__}: {str(e)}"
         logger.error(msg)
-        return Result.failed(code=500, message=msg)
+        return Result.error(code=500, message=msg)

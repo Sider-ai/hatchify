@@ -18,7 +18,9 @@ from hatchify.business.api.v1.graph_router import graphs_router
 from hatchify.business.api.v1.graph_version_router import graph_versions_router
 from hatchify.business.api.v1.message_router import messages_router
 from hatchify.business.api.v1.session_router import sessions_router
-from hatchify.business.api.v1.webhook_router import webhook_router
+from hatchify.business.api.v1.tool_router import tool_router
+from hatchify.business.api.v1.web_builder_router import web_builder_router
+from hatchify.business.api.v1.web_hook_router import web_hook_router
 from hatchify.common.domain.result.result import Result
 from hatchify.common.extensions.ext_storage import init_storage
 from hatchify.common.settings.settings import get_hatchify_settings
@@ -67,7 +69,7 @@ app.add_middleware(
 
 @app.exception_handler(Exception)
 async def exception_handler(request: Request, exc: Exception):
-    error = Result.failed(code=500, message=f"{type(exc).__name__}: {exc}")
+    error = Result.error(code=500, message=f"{type(exc).__name__}: {exc}")
     return JSONResponse(content=jsonable_encoder(error))
 
 
@@ -81,8 +83,10 @@ async def health():
     return JSONResponse(content={"status": "ok"})
 
 
-app.include_router(webhook_router, tags=["webhooks"])
+app.include_router(web_hook_router, tags=["webhooks"])
 app.include_router(graphs_router, tags=["graphs"])
 app.include_router(graph_versions_router, tags=["graph_versions"])
 app.include_router(messages_router, tags=["messages"])
 app.include_router(sessions_router, tags=["graphs"])
+app.include_router(web_builder_router, tags=["web_builder"])
+app.include_router(tool_router, tags=["tools"])

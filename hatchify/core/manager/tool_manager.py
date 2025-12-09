@@ -5,7 +5,7 @@ from loguru import logger
 from hatchify.core.factory.tool_factory import ToolRouter
 from hatchify.core.manager.mcp_manager import mcp_manager
 from hatchify.core.mcp.mcp_tool_loader import MCPToolLoader
-from hatchify.core.tools.math_tool import math_router
+from hatchify.core.graph.tools.math_tool import math_router
 
 tool_factory = ToolRouter()
 
@@ -15,13 +15,14 @@ tool_factory.include_router(math_router)
 def load_strands_tools():
     try:
         from strands.tools.loader import load_tools_from_module
-        from strands_tools import file_read, image_reader, editor, file_write
+        from strands_tools import file_read, image_reader, editor, file_write, shell
 
         modules = {
             "file_read": file_read,
             "image_reader": image_reader,
             "editor": editor,
-            "file_write": file_write
+            "file_write": file_write,
+            "shell": shell,
         }
 
         for module_name, module in modules.items():
@@ -51,16 +52,3 @@ async def async_load_mcp_server():
         for tool in mcp_tools:
             tool_factory.register(tool)
             logger.info(tool.tool_name)
-
-
-async def get_tool_info():
-    await asyncio.gather(
-        async_load_strands_tools(),
-        async_load_mcp_server()
-    )
-    for tool, desc in tool_factory.get_all_tools().items():
-        print(desc.tool_name, desc.tool_spec)
-
-
-if __name__ == '__main__':
-    asyncio.run(get_tool_info())

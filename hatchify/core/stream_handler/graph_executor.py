@@ -14,7 +14,7 @@ from hatchify.common.domain.event.base_event import StreamEvent
 from hatchify.common.domain.event.execute_event import NodeStartEvent, NodeStopEvent, NodeHandoffEvent, ResultEvent
 from hatchify.common.extensions.ext_storage import storage_client
 from hatchify.core.graph.graph_wrapper import GraphWrapper
-from hatchify.core.graph.stream_handler import BaseStreamHandler
+from hatchify.core.stream_handler.stream_handler import BaseStreamHandler
 
 document_formats = get_args(DocumentFormat)
 image_formats = get_args(ImageFormat)

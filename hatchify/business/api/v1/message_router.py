@@ -29,16 +29,13 @@ async def get_by_id(
     try:
         obj_tb: MessageTable = await service.get_by_id(session, _id)
         if not obj_tb:
-            return Result.failed(
-                code=404,
-                message="Message Not Found",
-            )
+            return Result.error(code=404, message="Message Not Found")
         response = MessageResponse.model_validate(obj_tb)
         return Result.ok(data=response)
     except Exception as e:
         msg = f"{type(e).__name__}: {str(e)}"
         logger.error(msg)
-        return Result.failed(code=500, message=msg)
+        return Result.error(code=500, message=msg)
 
 
 @messages_router.get("/history/{session_id}", response_model=Result[List[MessageResponse]])
@@ -58,7 +55,7 @@ async def history(
     except Exception as e:
         msg = f"{type(e).__name__}: {str(e)}"
         logger.error(msg)
-        return Result.failed(code=500, message=msg)
+        return Result.error(code=500, message=msg)
 
 
 @messages_router.get("/page", response_model=Result[PaginationInfo[List[MessageResponse]]])
@@ -86,4 +83,4 @@ async def page(
     except Exception as e:
         msg = f"{type(e).__name__}: {str(e)}"
         logger.error(msg)
-        return Result.failed(code=500, message=msg)
+        return Result.error(code=500, message=msg)

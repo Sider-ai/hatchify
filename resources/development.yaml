@@ -1,5 +1,9 @@
 hatchify:
   application: hatchify-dev
+  server:
+    host: 0.0.0.0
+    port: 8000
+    base_url: http://localhost:8000
   models:
     spec_generator:
       model: gemini-2.5-pro
@@ -13,20 +17,50 @@ hatchify:
       schema: fs
       bucket: hatchify
       folder: dev
-      root: /Users/fenghuanglin/Codes/hatchify/storage
-  session-manager:
+      root: ./storage
+  session_manager:
     manager: file
     file:
       folder: dev
-      root: /Users/fenghuanglin/Codes/hatchify/session
+      root: ./session
   db:
     platform: sqlite
     sqlite:
-      url: sqlite+aiosqlite:////Users/fenghuanglin/Codes/hatchify/dev.db
+      driver: sqlite+aiosqlite
+      file: ./dev.db
       echo: False
-      pool-pre-ping: True
-      connect-args:
+      pool_pre_ping: True
+      connect_args:
         check_same_thread: True
+  web_app_builder:
+    repo_url: git@github.com:Sider-ai/hatchify-web-app-template.git
+    branch: master
+    workspace: ./workspace
+    init_steps:
+      - type: env
+        file: .env
+        vars:
+          VITE_API_BASE_URL: "{{base_url}}"
+          VITE_GRAPH_ID: "{{graph_id}}"
+          VITE_GRAPH_INPUT_FORMAT: "{{graph_input_format}}"
+      - type: write_input_schema
+        file: src/schemas/input.schema.json
+      - type: write_output_schema
+        file: src/schemas/output.schema.json
+    security:
+      allowed_directories:
+        - ./workspace
+        - /tmp
+      sensitive_paths:
+        - ~/.ssh
+        - ~/.aws
+        - /.config
+        - /proc
+        - /sys
+        - /etc/passwd
+        - /etc/shadow
+        - /etc/ssh
+        - /root
 
 
 

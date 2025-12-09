@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.datastructures import FormData
 from starlette.responses import StreamingResponse
 
+from hatchify.business.utils.sse_helper import create_sse_response
 from hatchify.business.db.session import get_db
 from hatchify.business.manager.service_manager import ServiceManager
 from hatchify.business.services.graph_service import GraphService
@@ -18,15 +19,16 @@ from hatchify.common.extensions.ext_storage import storage_client
 from hatchify.common.settings.settings import get_hatchify_settings
 from hatchify.core.factory.session_manager_factory import create_session_manager
 from hatchify.core.graph.dynamic_graph_builder import DynamicGraphBuilder
-from hatchify.core.graph.graph_executor import GraphExecutor
-from hatchify.core.hooks.graph_state_hook import GraphStateHook
-from hatchify.core.manager.executor_manager import StreamManager
+
+from hatchify.core.graph.hooks.graph_state_hook import GraphStateHook
+from hatchify.core.manager.stream_manager import StreamManager
 from hatchify.core.manager.function_manager import function_router
 from hatchify.core.manager.tool_manager import tool_factory
+from hatchify.core.stream_handler.graph_executor import GraphExecutor
 from hatchify.core.utils.webhook_utils import infer_webhook_spec_from_schema
 
 settings = get_hatchify_settings()
-webhook_router = APIRouter(prefix="/webhooks")
+web_hook_router = APIRouter(prefix="/web-hooks")
 
 
 async def prepare_data(graph_id: str, graph_spec: GraphSpec, request: Request):
@@ -59,7 +61,7 @@ async def prepare_data(graph_id: str, graph_spec: GraphSpec, request: Request):
     return execute_data
 
 
-@webhook_router.get("/webhook-info/{graph_id}", response_model=Result[WebHookInfoResponse])
+@web_hook_router.get("/webhook-info/{graph_id}", response_model=Result[WebHookInfoResponse])
 async def get_webhook_info(
         graph_id: str,
         session: AsyncSession = Depends(get_db),
@@ -82,10 +84,10 @@ async def get_webhook_info(
     except Exception as e:
         msg = f"{type(e).__name__}: {e}"
         logger.error(msg)
-        return Result.failed(message=msg)
+        return Result.error(message=msg)
 
 
-@webhook_router.post("/invoke/{graph_id}", response_model=Result[Dict[str, Any]])
+@web_hook_router.post("/invoke/{graph_id}", response_model=Result[Dict[str, Any]])
 async def invoke(
         graph_id: str,
         request: Request,
@@ -96,7 +98,7 @@ async def invoke(
     session_id = uuid.uuid4().hex
     graph_spec = await service.get_graph_spec(session, graph_id)
     if not graph_spec:
-        return Result.failed(code=404, message=f"Graph '{graph_id}' not found")
+        return Result.error(code=404, message=f"Graph '{graph_id}' not found")
 
     output_required = graph_spec.output_schema.get("required", [])
     execute_data = await prepare_data(graph_id, graph_spec, request)
@@ -124,10 +126,10 @@ async def invoke(
     except Exception as e:
         msg = f"{type(e).__name__}: {e}"
         logger.error(msg)
-        return Result.failed(message=msg)
+        return Result.error(message=msg)
 
 
-@webhook_router.post("/submit/{graph_id}", response_model=Result[ExecutionResponse])
+@web_hook_router.post("/stream/{graph_id}", response_model=Result[ExecutionResponse])
 async def submit(
         graph_id: str,
         request: Request,
@@ -136,7 +138,7 @@ async def submit(
 ):
     graph_spec = await service.get_graph_spec(session, graph_id)
     if not graph_spec:
-        return Result.failed(code=404, message=f"Graph '{graph_id}' not found")
+        return Result.error(code=404, message=f"Graph '{graph_id}' not found")
 
     execution_id = uuid.uuid4().hex
 
@@ -157,41 +159,33 @@ async def submit(
 
         await executor.submit_task(execute_data)
 
-        return Result.ok(data=ExecutionResponse(graph_id=graph_id, execution_id=execution_id))
+        return Result.ok(data=ExecutionResponse(execution_id=execution_id))
 
     except Exception as e:
         msg = f"{type(e).__name__}: {e}"
         logger.error(msg)
-        return Result.failed(message=msg)
+        return Result.error(message=msg)
 
 
-@webhook_router.get("/stream/{execution_id}")
+@web_hook_router.get("/stream/{execution_id}")
 async def stream(
         execution_id: str,
         last_event_id: Optional[str] = Header(default=None, alias="Last-Event-ID"),
         latest_event_id: Optional[str] = Query(default=None)
 ):
-    executor = await StreamManager.get(execution_id)
-    if not executor:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Execution '{execution_id}' not found. It may have expired or been cleaned up."
-        )
+    """
+    获取 Webhook 执行的流式响应
 
-    effective_last_id = latest_event_id or last_event_id
+    Args:
+        execution_id: 执行 ID（从 submit 返回）
+        last_event_id: SSE 重连时的最后一个事件 ID（从 Header）
+        latest_event_id: SSE 重连时的最后一个事件 ID（从 Query，优先级更高）
 
-    try:
-        return StreamingResponse(
-            executor.worker(last_event_id=effective_last_id),
-            media_type="text/event-stream",
-            headers={
-                "Cache-Control": "no-cache, no-transform",
-                "Connection": "keep-alive",
-                "X-Accel-Buffering": "no",
-                "Access-Control-Allow-Origin": "*"
-            }
-        )
-    except Exception as e:
-        msg = f"{type(e).__name__}: {e}"
-        logger.error(f"Stream error for execution {execution_id}: {msg}")
-        raise HTTPException(status_code=500, detail=msg)
+    Returns:
+        StreamingResponse: SSE 流式响应
+    """
+    return await create_sse_response(
+        execution_id=execution_id,
+        last_event_id=last_event_id,
+        latest_event_id=latest_event_id
+    )

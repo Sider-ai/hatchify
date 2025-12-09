@@ -1,10 +1,10 @@
-from typing import Literal, Dict, Any, List
+from typing import Literal, Dict, Any, List, Optional
 
 from pydantic import BaseModel, Field
 
 
 class ExecutionResponse(BaseModel):
-    graph_id: str
+    session_id: Optional[str] = Field(default=None)
     execution_id: str
 
 

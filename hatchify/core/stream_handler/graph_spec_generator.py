@@ -25,7 +25,7 @@ from hatchify.common.domain.enums.message_role import MessageRole
 from hatchify.common.domain.enums.session_scene import SessionScene
 from hatchify.common.domain.event.base_event import StreamEvent, ResultEvent
 from hatchify.common.domain.event.edit_event import PhaseEvent
-from hatchify.common.domain.requests.graph import ConversationRequest
+from hatchify.common.domain.requests.graph import GraphConversationRequest
 from hatchify.common.domain.structured_output.graph_generation_output import (
     GraphArchitectureOutput,
     SchemaExtractionOutput,
@@ -33,7 +33,7 @@ from hatchify.common.domain.structured_output.graph_generation_output import (
 )
 from hatchify.common.settings.settings import get_hatchify_settings
 from hatchify.core.factory.tool_factory import ToolRouter
-from hatchify.core.graph.stream_handler import BaseStreamHandler
+
 from hatchify.core.manager.model_card_manager import ModelCardManager
 from hatchify.core.prompts.prompts import (
     GRAPH_GENERATOR_SYSTEM_PROMPT,
@@ -42,6 +42,7 @@ from hatchify.core.prompts.prompts import (
     GRAPH_REFINEMENT_USER_PROMPT,
     SCHEMA_EXTRACTOR_PROMPT, RESOURCE_MESSAGE,
 )
+from hatchify.core.stream_handler.stream_handler import BaseStreamHandler
 from hatchify.core.utils.json_generator import json_generator
 from hatchify.core.utils.schema_utils import generate_output_schema
 
@@ -344,7 +345,7 @@ class GraphSpecGenerator(BaseStreamHandler):
     async def submit_task(
             self,
             session_id: str,
-            request: ConversationRequest,
+            request: GraphConversationRequest,
     ):
         async_generator = self.conversation(session_id, request)
         await self.run_streamed(async_generator)
@@ -372,7 +373,7 @@ class GraphSpecGenerator(BaseStreamHandler):
     async def conversation(
             self,
             session_id: str,
-            request: ConversationRequest,
+            request: GraphConversationRequest,
     ):
         async with AsyncSessionLocal() as session:
 

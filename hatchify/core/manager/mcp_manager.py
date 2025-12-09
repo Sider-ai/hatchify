@@ -46,4 +46,4 @@ class MCPManager(BaseModel):
         return cls(servers=servers_dict)
 
 
-mcp_manager: MCPManager = MCPManager.parse_toml(Constants.Path.MCP_TOML)
+mcp_manager: MCPManager = MCPManager.parse_toml(Constants.Path.McpToml)

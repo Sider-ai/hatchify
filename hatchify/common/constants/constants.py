@@ -3,20 +3,15 @@ import os
 
 class Constants:
     class Path:
-        ROOT_PATH: str = os.path.dirname(
+        RootPath: str = os.path.dirname(
             os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         )
-        APP_PATH: str = os.path.join(ROOT_PATH, "app")
-        RESOURCES_PATH: str = os.path.join(ROOT_PATH, "resources")
-        MODELS_TOML: str = os.path.join(RESOURCES_PATH, "models.toml")
-        MCP_TOML: str = os.path.join(RESOURCES_PATH, "mcp.toml")
-        ENV_PATH: str = os.path.join(RESOURCES_PATH, ".env")
-        YAML_FILE_PATH: str = os.path.join(
-            RESOURCES_PATH, f"{os.environ.get('ENVIRONMENT', 'development')}.yaml"
-        )
+        AppPath: str = os.path.join(RootPath, "app")
+        ResourcesPath: str = os.path.join(RootPath, "resources")
+        ModelPath: str = os.path.join(ResourcesPath, "models.toml")
+        McpToml: str = os.path.join(ResourcesPath, "mcp.toml")
+        EnvPath: str = os.path.join(ResourcesPath, ".env")
 
-        GRAPH_JSONS: str = os.path.join(ROOT_PATH, "graph_json")
-
-
-if __name__ == '__main__':
-    print(Constants.Path.YAML_FILE_PATH)
+        @classmethod
+        def get_yaml_path(cls, environment: str) -> str:
+            return os.path.join(cls.ResourcesPath, f"{environment}.yaml")

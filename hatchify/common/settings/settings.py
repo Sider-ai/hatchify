@@ -1,8 +1,9 @@
+import os
 from functools import lru_cache
-from typing import Type, Tuple, Optional, Any
+from pathlib import Path
+from typing import Type, Tuple, Optional, Any, Annotated, Literal, List, Union, Dict
 
-from dotenv import load_dotenv
-from pydantic import Field, BaseModel, model_validator
+from pydantic import Field, BaseModel, model_validator, BeforeValidator, computed_field
 from pydantic_settings import (
     PydanticBaseSettingsSource,
     BaseSettings,
@@ -15,7 +16,40 @@ from hatchify.common.domain.enums.db_type import DatabasePlatform
 from hatchify.common.domain.enums.session_manager_type import SessionManagerType
 from hatchify.common.domain.enums.storage_type import StorageType
 
-load_dotenv(dotenv_path=Constants.Path.ENV_PATH)
+
+def resolve_path(v: str | Path | None) -> str | None:
+    if v is None:
+        return None
+    path = Path(v).expanduser()
+    if not path.is_absolute():
+        path = Path(Constants.Path.RootPath) / path
+    return path.resolve().as_posix()
+
+
+ResolvablePath = Annotated[str | None, BeforeValidator(resolve_path)]
+
+
+class EnvSettings(BaseSettings):
+    environment: str = Field(default="dev", validation_alias="ENVIRONMENT")
+
+    model_config = SettingsConfigDict(
+        env_file=Constants.Path.EnvPath if os.path.exists(Constants.Path.EnvPath) else None,
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
+
+    @property
+    def yaml_path(self) -> str:
+        return Constants.Path.get_yaml_path(self.environment)
+
+
+_env_settings = EnvSettings()
+
+
+class ServerSettings(BaseSettings):
+    host: str
+    port: int
+    base_url: str
 
 
 class ProviderSettings(BaseSettings):
@@ -36,10 +70,10 @@ class ModelSettings(BaseSettings):
 
 
 class OpenDal(BaseModel):
-    opendal_schema: str | None = Field(default="fs", alias='schema')
+    opendal_schema: str | None = Field(default="fs")
     bucket: str
     folder: str | None
-    root: str | None
+    root: ResolvablePath = None
 
 
 class StorageSettings(BaseModel):
@@ -56,7 +90,7 @@ class StorageSettings(BaseModel):
 
 class FileManagerSettings(BaseSettings):
     folder: str | None
-    root: str | None
+    root: ResolvablePath = None
 
 
 class SessionManagerSettings(BaseSettings):
@@ -65,13 +99,22 @@ class SessionManagerSettings(BaseSettings):
 
 
 class SqliteSettings(BaseModel):
-    url: str
+    driver: str = Field(default="sqlite+aiosqlite")
+    file: ResolvablePath = None
     echo: bool = Field(default=False)
-    pool_pre_ping: bool = Field(default=True, alias="pool-pre-ping")
+    pool_pre_ping: bool = Field(default=True)
     connect_args: dict[str, Any] = Field(
         default_factory=dict,
-        alias="connect-args",
     )
+
+    @computed_field
+    @property
+    def url(self) -> str:
+        """生成完整的 SQLite 连接 URL"""
+        if self.file is None:
+            raise ValueError("SQLite file path is required")
+        # sqlite+aiosqlite:////absolute/path/to/db.sqlite
+        return f"{self.driver}:///{self.file}"
 
 
 class DbSettings(BaseModel):
@@ -86,21 +129,53 @@ class DbSettings(BaseModel):
         return values
 
 
+class EnvStep(BaseModel):
+    """写入环境变量文件"""
+    type: Literal["env"] = "env"
+    file: str | None = None
+    vars: Dict[str, Any] = Field(default_factory=dict)
+
+
+class WriteInputSchemaStep(BaseModel):
+    """写入输入 schema 文件"""
+    type: Literal["write_input_schema"] = "write_input_schema"
+    file: str | None = None
+
+
+class WriteOutputSchemaStep(BaseModel):
+    """写入输出 schema 文件"""
+    type: Literal["write_output_schema"] = "write_output_schema"
+    file: str | None = None
+
+
+class SecuritySettings(BaseModel):
+    allowed_directories: List[str] = Field(default_factory=list)
+    sensitive_paths: List[str] = Field(default_factory=list)
+
+
+class WebAppBuilderSettings(BaseSettings):
+    repo_url: str
+    branch: str = Field(default="master")
+    workspace: ResolvablePath = None
+    init_steps: List[Union[EnvStep | WriteInputSchemaStep | WriteOutputSchemaStep]] | None = Field(default=None)
+    security: SecuritySettings | None = Field(default=None)
+
 class HatchifySettings(BaseModel):
     application: str
+    server: ServerSettings | None = Field(default=None)
     models: ModelSettings | None = Field(default=None)
     storage: StorageSettings | None = Field(default=None)
-    session_manager: SessionManagerSettings | None = Field(default=None, alias="session-manager")
+    session_manager: SessionManagerSettings | None = Field(default=None)
     db: DbSettings | None = Field(default=None)
+    web_app_builder: WebAppBuilderSettings | None = Field(default=None)
 
 
 class AppSettings(BaseSettings):
     hatchify: HatchifySettings | None = Field(default=None)
 
     model_config = SettingsConfigDict(
-        yaml_file=Constants.Path.YAML_FILE_PATH,
-        yaml_file_encoding="utf-8",
-        extra="ignore",
+        env_nested_delimiter='__',
+        extra="ignore"
     )
 
     @classmethod
@@ -114,8 +189,12 @@ class AppSettings(BaseSettings):
     ) -> Tuple[PydanticBaseSettingsSource, ...]:
         return (
             init_settings,
-            YamlConfigSettingsSource(settings_cls),
             env_settings,
+            YamlConfigSettingsSource(
+                settings_cls,
+                yaml_file=_env_settings.yaml_path,
+                yaml_file_encoding="utf-8",
+            ),
             dotenv_settings,
             file_secret_settings,
         )
@@ -125,3 +204,7 @@ class AppSettings(BaseSettings):
 def get_hatchify_settings():
     app_settings = AppSettings()
     return app_settings.hatchify
+
+
+if __name__ == '__main__':
+    print(get_hatchify_settings())

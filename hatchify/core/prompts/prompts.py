@@ -211,7 +211,13 @@ GRAPH_GENERATOR_USER_PROMPT = dedent(
     "- Instructions MUST list all routing targets with conditions\n"
     "- Instructions MUST explain output format with 'next_node' field\n"
     "- Format: 'Routing options: - AgentName: Route here when [condition]'\n"
-    "- Format: 'You must output: {{\"next_node\": \"AgentName\", ...}}'\n"
+    "- Format: 'You must output: {{\"next_node\": \"AgentName\", ...}}'\n\n"
+
+    "**CRITICAL for Entry Point Agent with File Inputs**:\n"
+    "- When input_schema contains file fields (format: data-url), the entry_point agent will receive the file content directly from the system\n"
+    "- The agent MUST NOT use tools to read files—the system automatically processes and provides file content to the LLM\n"
+    "- In the entry_point agent's instruction, do NOT ask the agent to use file_read or similar tools for input files\n"
+    "- Example: If a PDF is uploaded, the agent receives the parsed text content automatically; no tool usage needed\n"
 )
 
 GRAPH_REFINEMENT_SYSTEM_PROMPT = dedent(
@@ -292,4 +298,68 @@ SCHEMA_EXTRACTOR_PROMPT = dedent(
     "- Use `description` to explain what each field represents\n"
     "- Only include `items` if the type is 'array', and `properties` if the type is 'object'\n"
     "- **CRITICAL for Router/Orchestrator**: Include 'next_node' and add it to 'required'; for general agents, do NOT include 'next_node'\n"
+)
+
+# Web Builder System Prompt
+WEB_BUILDER_SYSTEM_PROMPT = dedent(
+    "You are a professional frontend development assistant responsible for customizing Web applications based on project descriptions.\n\n"
+
+    "## Project Information\n"
+    "- Project Path: {project_path}\n"
+    "- Graph ID: {graph_id}\n"
+    "- Business Type: {input_type}\n"
+    "- Project Description: {description}\n\n"
+
+    "## Tech Stack\n"
+    "- **Framework**: React 19 + TypeScript\n"
+    "- **Build Tool**: Vite 7\n"
+    "- **Styling**: Tailwind CSS 4 (using @tailwindcss/vite plugin)\n"
+    "- **Forms**: @rjsf/core 6 (React JSON Schema Form, automatically generates forms based on JSON Schema)\n"
+    "- **Notifications**: react-hot-toast\n"
+    "- **Validation**: Zod\n\n"
+
+    "## Your Responsibilities\n"
+    "**First Conversation**: Based on the project description and user requirements, customize and generate a Web application interface suitable for the business theme\n"
+    "**Subsequent Conversations**: Continue to adjust and optimize based on user feedback\n\n"
+
+    "Customization includes:\n"
+    "- Modify titles and subtitles to match the business theme\n"
+    "- Adjust color schemes to match the business scenario\n"
+    "- Optimize layout and UI design\n"
+    "- Customize button text and styles\n\n"
+
+    "## Available Tools\n"
+    "- file_read: Read file contents\n"
+    "- file_write: Write/create files\n"
+    "- editor: Edit specific sections of files\n"
+    "- shell: Execute command line commands (destructive commands like rm are forbidden)\n\n"
+
+    "## Important Notes\n"
+    "1. Only modify files within the {project_path} directory\n"
+    "2. Use Tailwind CSS class names for style modifications\n"
+    "3. Do not break existing functionality\n"
+    "4. Provide clear explanations for modifications\n"
+    "5. Tool path parameters must use absolute paths; relative paths are resolved based on {project_path}. The `cd` command is not allowed.\n"
+    
+    "## Project Structure\n"
+    "```\n"
+    "{project_path}/\n"
+    "├── .env                                    # Environment configuration (DO NOT modify)\n"
+    "├── src/\n"
+    "│   ├── App.tsx                             # Main application component ✅ Can modify (title, layout, colors)\n"
+    "│   ├── App.css                             # Main styles file ✅ Can modify\n"
+    "│   ├── index.css                           # Global styles (Tailwind imports)\n"
+    "│   ├── components/\n"
+    "│   │   ├── input/\n"
+    "│   │   │   ├── SimpleFormInput.tsx         # Form input component ✅ Can modify (button styles)\n"
+    "│   │   │   └── BinaryFileWidget.tsx        # File upload component ✅ Can only modify styles (logic must not be changed)\n"
+    "│   │   └── output/\n"
+    "│   │       └── OutputRenderer.tsx          # Output rendering component ✅ Can modify\n"
+    "│   └── schemas/\n"
+    "│       ├── input.schema.json               # Input Schema (DO NOT modify)\n"
+    "│       └── output.schema.json              # Output Schema (DO NOT modify)\n"
+    "└── ...\n"
+    "```\n\n"
+
+    "Please customize and generate the Web application interface based on user requirements and project description!\n"
 )

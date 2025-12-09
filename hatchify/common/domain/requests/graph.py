@@ -22,7 +22,7 @@ class UpdateGraphRequest(BaseModel):
     spec: Optional[dict] = Field(default=None, description="图的 spec")
 
 
-class ConversationRequest(BaseModel):
+class GraphConversationRequest(BaseModel):
     messages: Messages
     mode: ConversationMode = Field(
         default=ConversationMode.EDIT,
