@@ -20,17 +20,17 @@ hatchify:
       schema: fs
       bucket: hatchify
       folder: dev
-      root: ./storage
+      root: ./data/storage
   session_manager:
     manager: file
     file:
       folder: dev
-      root: ./session
+      root: ./data/session
   db:
     platform: sqlite
     sqlite:
       driver: sqlite+aiosqlite
-      file: ./dev.db
+      file: ./data/dev.db
       echo: False
       pool_pre_ping: True
       connect_args:
@@ -38,7 +38,7 @@ hatchify:
   web_app_builder:
     repo_url: git@github.com:Sider-ai/hatchify-web-app-template.git
     branch: master
-    workspace: ./workspace
+    workspace: ./data/workspace
     init_steps:
       - type: env
         file: .env
@@ -52,7 +52,7 @@ hatchify:
         file: src/schemas/output.schema.json
     security:
       allowed_directories:
-        - ./workspace
+        - ./data/workspace
         - /tmp
       sensitive_paths:
         - ~/.ssh
