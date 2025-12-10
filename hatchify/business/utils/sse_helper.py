@@ -11,6 +11,7 @@ async def create_sse_response(
         execution_id: str,
         last_event_id: Optional[str] = None,
         latest_event_id: Optional[str] = None,
+        replay: bool = False,
 ) -> StreamingResponse:
     """
     创建 SSE 流式响应
@@ -19,6 +20,7 @@ async def create_sse_response(
         execution_id: 执行 ID
         last_event_id: SSE 重连时的最后一个事件 ID（从 Header）
         latest_event_id: SSE 重连时的最后一个事件 ID（从 Query，优先级更高）
+        replay: 是否强制从头重播所有事件（忽略 last_event_id）
 
     Returns:
         StreamingResponse: SSE 流式响应
@@ -34,8 +36,8 @@ async def create_sse_response(
             detail=f"Execution '{execution_id}' not found. It may have expired or been cleaned up."
         )
 
-    # 确定有效的 last_event_id（优先使用 query 参数）
-    effective_last_id = latest_event_id or last_event_id
+    # 确定有效的 last_event_id（如果 replay=True，强制为 None 以重播所有事件）
+    effective_last_id = None if replay else (latest_event_id or last_event_id)
 
     # 创建 SSE 响应
     try:

@@ -81,24 +81,23 @@ async def quick_init(project_path: Path, ctx: InitContext):
                 raise TypeError(f"Unknown step type: {step.type}")
 
 
-async def sync_web_project(graph_id: str, ctx: InitContext) -> Path:
+async def sync_web_project(ctx: InitContext) -> Path:
     """
     同步 Web 项目：
     - 如果不存在，克隆并初始化
     - 如果存在，只更新配置文件（不覆盖 LLM 修改的代码）
 
     Args:
-        graph_id: Graph ID
         ctx: 初始化上下文
 
     Returns:
         项目路径
     """
-    project_path = get_repository_path(graph_id)
+    project_path = get_repository_path(ctx.graph_id)
 
     if not project_path.exists():
         # 首次创建：克隆模板
-        await quick_clone_repository(graph_id)
+        await quick_clone_repository(ctx.graph_id)
 
     # 更新配置文件（.env, schemas）
     await quick_init(project_path, ctx)

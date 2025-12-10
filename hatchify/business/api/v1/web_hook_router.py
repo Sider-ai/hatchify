@@ -171,7 +171,8 @@ async def submit(
 async def stream(
         execution_id: str,
         last_event_id: Optional[str] = Header(default=None, alias="Last-Event-ID"),
-        latest_event_id: Optional[str] = Query(default=None)
+        latest_event_id: Optional[str] = Query(default=None),
+        replay: bool = Query(default=False),
 ):
     """
     获取 Webhook 执行的流式响应
@@ -180,6 +181,7 @@ async def stream(
         execution_id: 执行 ID（从 submit 返回）
         last_event_id: SSE 重连时的最后一个事件 ID（从 Header）
         latest_event_id: SSE 重连时的最后一个事件 ID（从 Query，优先级更高）
+        replay: 是否强制从头重播所有事件（即使任务已完成）
 
     Returns:
         StreamingResponse: SSE 流式响应
@@ -187,5 +189,6 @@ async def stream(
     return await create_sse_response(
         execution_id=execution_id,
         last_event_id=last_event_id,
-        latest_event_id=latest_event_id
+        latest_event_id=latest_event_id,
+        replay=replay
     )

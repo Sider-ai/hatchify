@@ -398,6 +398,9 @@ WEB_BUILDER_SYSTEM_PROMPT = dedent(
     "## Available Tools\n"
     "file_read, image_reader, file_write, editor, shell (destructive commands forbidden)\n\n"
 
+    "## IMPORTANT: Code Only - No Build Commands\n"
+    "Focus ONLY on writing and modifying code. DO NOT run npm, pnpm, yarn, or any build/install commands - deployment is handled separately.\n\n"
+
     "## Project Structure\n"
     "```\n"
     "{project_path}/\n"

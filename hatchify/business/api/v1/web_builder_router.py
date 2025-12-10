@@ -13,7 +13,7 @@ from hatchify.business.services.graph_service import GraphService
 from hatchify.business.utils.sse_helper import create_sse_response
 from hatchify.common.domain.entity.agent_card import AgentCard
 from hatchify.common.domain.entity.init_context import InitContext
-from hatchify.common.domain.requests.web_builder import WebBuilderConversationRequest
+from hatchify.common.domain.requests.web_builder import WebBuilderConversationRequest, DeployRequest
 from hatchify.common.domain.responses.web_hook import ExecutionResponse
 from hatchify.common.domain.result.result import Result
 from hatchify.common.settings.settings import get_hatchify_settings
@@ -22,7 +22,9 @@ from hatchify.core.factory.session_manager_factory import create_session_manager
 from hatchify.core.graph.hooks.security_file_hook import SecurityFileHook
 from hatchify.core.manager.stream_manager import StreamManager
 from hatchify.core.prompts.prompts import WEB_BUILDER_SYSTEM_PROMPT
+from hatchify.core.stream_handler.deploy import DeployGenerator
 from hatchify.core.stream_handler.web_builder import WebBuilderGenerator
+from hatchify.core.utils.quick_init_utils import get_repository_path
 from hatchify.core.utils.quick_init_utils import sync_web_project
 from hatchify.core.utils.webhook_utils import infer_webhook_spec_from_schema
 
@@ -55,7 +57,6 @@ def create_web_builder_agent_card(
 @web_builder_router.post("/stream", response_model=Result[ExecutionResponse])
 async def submit_stream_conversation(
         request: WebBuilderConversationRequest,
-        session_id: Optional[str] = Query(default=uuid.uuid4().hex),
         session: AsyncSession = Depends(get_db),
         service: GraphService = Depends(ServiceManager.get_service_dependency(GraphService)),
 ):
@@ -69,6 +70,8 @@ async def submit_stream_conversation(
     2. 同步 Web 项目（如不存在则创建，更新配置文件）
     3. 创建 Agent 和 Generator
     4. 提交流式任务并返回 execution_id
+
+    注意：使用 graph_id 作为 session_id，确保同一个 graph 的所有对话都在同一个会话中
     """
     execution_id = uuid.uuid4().hex
     try:
@@ -91,8 +94,8 @@ async def submit_stream_conversation(
         )
 
         # 4. 同步 Web 项目（确保存在 + 配置最新）
-        project_path = await sync_web_project(request.graph_id, init_ctx)
-        project_absolute_path =  project_path.absolute().as_posix()
+        project_path = await sync_web_project(init_ctx)
+        project_absolute_path = project_path.absolute().as_posix()
         # 5. 创建 Agent Card
         agent_card = create_web_builder_agent_card(
             project_path=project_absolute_path,
@@ -100,12 +103,15 @@ async def submit_stream_conversation(
             input_type=webhook_spec.input_type,
             description=graph_spec.description
         )
-        # 6. 创建 Agent
+        # 6. 创建 Agent（使用 graph_id 作为 session_id）
         agent = create_agent_by_agent_card(
             agent_card=agent_card,
             conversation_manager=SlidingWindowConversationManager(),
-            session_manager=create_session_manager(session_id=session_id),
-            hooks=[SecurityFileHook(project_absolute_path)]
+            session_manager=create_session_manager(session_id=request.graph_id),
+            hooks=[SecurityFileHook(
+                workspace=project_absolute_path,
+                extra_banned_commands=['npm', 'pnpm', 'yarn', 'bun', 'deno']  # 禁用包管理器和构建命令
+            )]
         )
 
         # 7. 创建 Generator 并提交任务
@@ -116,8 +122,8 @@ async def submit_stream_conversation(
         await StreamManager.create(execution_id, generator)
         await generator.submit_task(request=request)
 
-        # 8. 返回 execution_id
-        return Result.ok(data=ExecutionResponse(session_id=session_id, execution_id=execution_id))
+        # 8. 返回 execution_id（session_id 使用 graph_id）
+        return Result.ok(data=ExecutionResponse(session_id=request.graph_id, execution_id=execution_id))
 
     except Exception as e:
         msg = f"{type(e).__name__}: {e}"
@@ -130,6 +136,7 @@ async def stream_conversation(
         execution_id: str = Path(...),
         last_event_id: Optional[str] = Header(default=None, alias="Last-Event-ID"),
         latest_event_id: Optional[str] = Query(default=None),
+        replay: bool = Query(default=False),
 ):
     """
     获取 Web Builder 对话的流式响应
@@ -138,6 +145,7 @@ async def stream_conversation(
         execution_id: 执行 ID（从 submit_stream_conversation 返回）
         last_event_id: SSE 重连时的最后一个事件 ID（从 Header）
         latest_event_id: SSE 重连时的最后一个事件 ID（从 Query，优先级更高）
+        replay: 是否强制从头重播所有事件（即使任务已完成）
 
     Returns:
         StreamingResponse: SSE 流式响应
@@ -145,5 +153,90 @@ async def stream_conversation(
     return await create_sse_response(
         execution_id=execution_id,
         last_event_id=last_event_id,
-        latest_event_id=latest_event_id
+        latest_event_id=latest_event_id,
+        replay=replay
+    )
+
+
+@web_builder_router.post("/deploy", response_model=Result[ExecutionResponse])
+async def deploy_web_app(
+        request: DeployRequest,
+        session: AsyncSession = Depends(get_db),
+        service: GraphService = Depends(ServiceManager.get_service_dependency(GraphService)),
+):
+    """
+    部署 Web 应用
+
+    流程：
+    1. 检查 graph 是否存在
+    2. 检查项目目录
+    3. 提交部署任务（npm install + build）
+    4. 动态挂载静态文件到 /preview/{graph_id}/
+    5. 返回 execution_id 用于获取流式日志
+    """
+    execution_id = uuid.uuid4().hex
+    try:
+        # 1. 检查 graph 是否存在
+        graph_spec = await service.get_graph_spec(session, request.graph_id)
+        if not graph_spec:
+            raise HTTPException(status_code=404, detail=f"Graph '{request.graph_id}' not found")
+
+        # 2. 检查项目目录
+        project_path = get_repository_path(request.graph_id)
+        if not project_path.exists():
+            raise HTTPException(
+                status_code=400,
+                detail=f"项目目录不存在，请先通过 /web-builder/stream 生成代码"
+            )
+
+        # 3. 创建 DeployGenerator
+        generator = DeployGenerator(
+            source_id=execution_id,
+            graph_id=request.graph_id,
+            project_path=str(project_path),
+            redeploy=request.redeploy,
+        )
+
+        # 4. 提交部署任务
+        await StreamManager.create(execution_id, generator)
+        await generator.submit_task()
+
+        # 5. 返回 execution_id
+        return Result.ok(data=ExecutionResponse(
+            session_id=request.graph_id,
+            execution_id=execution_id
+        ))
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        msg = f"{type(e).__name__}: {e}"
+        logger.error(msg)
+        return Result.error(message=msg)
+
+
+@web_builder_router.get("/deploy/{execution_id}")
+async def stream_deploy(
+        execution_id: str = Path(...),
+        last_event_id: Optional[str] = Header(default=None, alias="Last-Event-ID"),
+        latest_event_id: Optional[str] = Query(default=None),
+        replay: bool = Query(default=False),
+):
+    """
+    获取部署流式响应
+
+    Args:
+        execution_id: 执行 ID（从 deploy_web_app 返回）
+        last_event_id: SSE 重连时的最后一个事件 ID（从 Header）
+        latest_event_id: SSE 重连时的最后一个事件 ID（从 Query，优先级更高）
+        replay: 是否强制从头重播所有事件（即使任务已完成）
+
+    Returns:
+        StreamingResponse: SSE 流式响应
+    """
+    return await create_sse_response(
+        execution_id=execution_id,
+        last_event_id=last_event_id,
+        latest_event_id=latest_event_id,
+        replay=replay
     )

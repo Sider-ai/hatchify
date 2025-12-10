@@ -46,6 +46,7 @@ hatchify:
           VITE_API_BASE_URL: "{{base_url}}"
           VITE_GRAPH_ID: "{{graph_id}}"
           VITE_GRAPH_INPUT_FORMAT: "{{graph_input_format}}"
+          VITE_BASE_PATH: "/preview/{{graph_id}}"
       - type: write_input_schema
         file: src/schemas/input.schema.json
       - type: write_output_schema

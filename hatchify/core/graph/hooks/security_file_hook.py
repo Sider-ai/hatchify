@@ -56,7 +56,7 @@ class Command(TypedDict):
 
 
 class SecurityFileHook(HookProvider):
-    def __init__(self, workspace: str):
+    def __init__(self, workspace: str, extra_banned_commands: Optional[List[str]] = None):
         super().__init__()
         self.workspace = os.path.realpath(workspace)
         self.home = os.path.realpath(os.path.expanduser("~"))
@@ -70,6 +70,10 @@ class SecurityFileHook(HookProvider):
             os.path.realpath(os.path.expanduser(path))
             for path in settings.web_app_builder.security.sensitive_paths
         }
+        # 额外的禁用命令列表（实例级别）
+        self.extra_banned_commands = set(
+            cmd.lower() for cmd in (extra_banned_commands or [])
+        )
 
     def register_hooks(self, registry: HookRegistry, **kwargs: Any) -> None:  # type: ignore
         registry.add_callback(BeforeToolCallEvent, self.before_tool_call)
@@ -271,12 +275,14 @@ class SecurityFileHook(HookProvider):
     def expand_path_for_tilde(self, path: str) -> str:
         return re.sub(r'^~(?=/|$)', self.home, path)
 
-    @staticmethod
-    def is_banned_command(base_cmd: str) -> bool:
+    def is_banned_command(self, base_cmd: str) -> bool:
+        """检查命令是否被禁用（全局 + 实例级别）"""
         if not base_cmd:
             return False
 
-        return base_cmd.lower() in BANNED_COMMANDS
+        base_cmd_lower = base_cmd.lower()
+        # 检查全局禁用列表 + 实例级别额外禁用
+        return base_cmd_lower in BANNED_COMMANDS or base_cmd_lower in self.extra_banned_commands
 
     def normalize_file_path(self, path: str) -> str:
         """规范化文件路径，解析符号链接防止绕过攻击
