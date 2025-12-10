@@ -129,29 +129,46 @@ class BaseStreamHandler(metaclass=abc.ABCMeta):
 
     async def worker(self, last_event_id: Optional[str] = None):
         try:
-            # 重连模式：先读历史，再切换到实时
+            # 第一优先级：检查任务是否已完成
+            if self.event_store and self.event_store.is_completed():
+                logger.info(f"Task {self.source_id} already completed, returning historical events with done")
+
+                # 根据是否有 last_event_id 决定返回哪些历史事件
+                if last_event_id:
+                    # 重连场景：只返回客户端缺失的事件
+                    historical_events = self.event_store.get_after(last_event_id)
+                    if not historical_events:
+                        # 客户端已经有所有事件，返回完整历史用于UI重建
+                        historical_events = self.event_store.get_all()
+                else:
+                    # 新连接：返回所有历史事件
+                    historical_events = self.event_store.get_all()
+
+                # 返回历史事件（最后一个事件必定是 done）
+                for event in historical_events:
+                    yield self.format_sse(event)
+
+                # 任务已完成，直接退出，不启动 ping
+                return
+
+            # 第二优先级：重连模式（任务未完成，但客户端断线重连）
             if last_event_id and self.event_store:
-                logger.info(f"Reconnect request with last_event_id: {last_event_id}")
+                logger.info(f"Reconnect to running task with last_event_id: {last_event_id}")
 
                 historical_events = self.event_store.get_after(last_event_id)
 
                 # 如果没有新事件，返回完整历史让客户端重建UI状态
-                # （因为客户端刷新后本地状态被清空，需要所有历史事件来恢复UI）
                 if not historical_events:
                     logger.info(f"No new events after {last_event_id}, returning full history for UI reconstruction")
                     historical_events = self.event_store.get_all()
 
+                # 先推送历史事件
                 for event in historical_events:
                     yield self.format_sse(event)
 
-                # 如果任务已完成，直接返回
-                if self.event_store.is_completed():
-                    logger.info(f"Task already completed for {self.source_id}")
-                    return
+                logger.info(f"Historical events sent, switching to real-time queue")
 
-                # 历史事件读完后，切换到实时 Queue 读取
-                logger.info(f"Switching to real-time queue for {self.source_id}")
-
+            # 任务未完成，启动实时流式推送
             await self.start_ping()
             async for event in self.stream_events():
                 yield self.format_sse(event)
