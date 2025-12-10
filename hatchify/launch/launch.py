@@ -58,7 +58,6 @@ app = FastAPI(
     title="Hatchify API",
     description="API for Hatchify",
     version="0.0.1",
-    root_path="/api",
     lifespan=lifespan,
 )
 
@@ -87,11 +86,12 @@ async def health():
     return JSONResponse(content={"status": "ok"})
 
 
-app.include_router(web_hook_router, tags=["webhooks"])
-app.include_router(graphs_router, tags=["graphs"])
-app.include_router(graph_versions_router, tags=["graph_versions"])
-app.include_router(messages_router, tags=["messages"])
-app.include_router(sessions_router, tags=["sessions"])
-app.include_router(web_builder_router, tags=["web_builder"])
-app.include_router(tool_router, tags=["tools"])
-app.include_router(model_router, tags=["models"])
+# 所有 API 路由都挂载到 /api 前缀下
+app.include_router(web_hook_router, prefix="/api", tags=["webhooks"])
+app.include_router(graphs_router, prefix="/api", tags=["graphs"])
+app.include_router(graph_versions_router, prefix="/api", tags=["graph_versions"])
+app.include_router(messages_router, prefix="/api", tags=["messages"])
+app.include_router(sessions_router, prefix="/api", tags=["sessions"])
+app.include_router(web_builder_router, prefix="/api", tags=["web_builder"])
+app.include_router(tool_router, prefix="/api", tags=["tools"])
+app.include_router(model_router, prefix="/api", tags=["models"])

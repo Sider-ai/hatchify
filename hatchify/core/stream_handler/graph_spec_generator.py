@@ -340,7 +340,7 @@ class GraphSpecGenerator(BaseStreamHandler):
                     return MessageRole.USER
 
     async def handle_stream_event(self, event: Any):
-        await self.stream_queue.put(event)
+        await self.emit_event(event)
 
     async def submit_task(
             self,

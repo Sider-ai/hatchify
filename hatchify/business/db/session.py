@@ -40,4 +40,4 @@ async def init_db():
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-        logger.debug("✅ 数据库表检查完成")
+        logger.debug("Initialized db")
