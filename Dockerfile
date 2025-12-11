@@ -7,6 +7,8 @@ ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy UV_PYTHON_DOWNLOADS=0
 
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y git
+
 RUN pip install  uv
 
 COPY pyproject.toml /app
