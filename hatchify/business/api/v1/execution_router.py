@@ -18,7 +18,7 @@ from hatchify.common.domain.result.result import Result
 executions_router = APIRouter(prefix="/executions")
 
 
-@executions_router.get("/{id}", response_model=Result[ExecutionResponse])
+@executions_router.get("/get_by_id/{id}", response_model=Result[ExecutionResponse])
 async def get_by_id(
         _id: str = Path(default=..., alias="id"),
         session: AsyncSession = Depends(get_db),
@@ -50,10 +50,7 @@ async def page(
         pages: Page[ExecutionTable] = await service.get_paginated_list(
             session,
             params,
-            graph_id=list_request.graph_id,
-            session_id=list_request.session_id,
-            status=list_request.status,
-            execution_type=list_request.type,
+            sort=list_request.sort
         )
         data = [ExecutionResponse.model_validate(item) for item in pages.items]
         page_info = PaginationInfo.from_fastapi_page(data=data, page_result=pages)
