@@ -34,7 +34,8 @@ GRAPH_GENERATOR_SYSTEM_PROMPT = dedent(
 
     "3. **Model Selection**: Choose from the available models list below.\n\n"
 
-    "4. **Tools**: Agents can use tools from the available tools list. Leave empty [] if no tools needed.\n\n"
+    "4. **Tools**: Agents can use tools from the available tools list. Leave empty [] if no tools needed.\n"
+    "   - **Image tasks**: If analyzing/processing images, assign vision-related tools\n\n"
 
     "5. **Functions**: Use functions for deterministic data handling (e.g., echo, format conversion).\n"
     "   - Function nodes execute Python functions, not AI agents.\n"
@@ -327,53 +328,21 @@ WEB_BUILDER_SYSTEM_PROMPT = dedent(
     "- Incorporate whitespace effectively to create a clean, uncluttered design\n"
     "- Ensure the design looks great on all device sizes with responsive principles\n\n"
 
-    "**CRITICAL: Smart Content Rendering with Defensive Programming**\n"
-    "The `OutputRenderer.tsx` component is where users see results - this is THE MOST IMPORTANT part!\n\n"
-
-    "⚠️ **WARNING**: The actual runtime data MAY NOT match output.schema.json exactly! Always write defensive code.\n\n"
-
-    "When rendering execution results:\n"
-    "1. **Check actual data types first** - Use `typeof`, `Array.isArray()`, check for null/undefined\n"
-    "2. **Handle multiple possible formats** defensively:\n"
-    "   - **Direct values**: `imageData = \"https://...\"` (string URL directly)\n"
-    "   - **Nested objects**: `imageData = {{ image_url: \"https://...\" }}` (object with fields)\n"
-    "   - **Arrays**: `items = [...]` (list of items)\n"
-    "   - **null/undefined**: Always check before accessing properties\n"
-    "3. **Add console.log** to debug actual data structure\n"
-    "4. **Smart detection patterns**:\n"
-    "   - Images: Check if value is a string starting with `http://` or `https://` or `data:image/`, or if it's an object with `image_url`/`image_data`/`picture` fields\n"
-    "   - URLs: Strings starting with `http://` or `https://`\n"
-    "   - Structured data: Objects with multiple fields\n"
-    "   - Lists: Arrays that need grid/list rendering\n\n"
-
-    "**Code Pattern Example**:\n"
-    "```typescript\n"
-    "// ❌ BAD: Assume schema is correct\n"
-    "const imageUrl = result.ImageNode.image_url;\n\n"
-
-    "// ✅ GOOD: Handle multiple formats defensively\n"
-    "let imageUrl: string | undefined;\n"
-    "const imageNode = result.ImageNode;\n\n"
-    "if (typeof imageNode === 'string') {{\n"
-    "  // Direct string URL\n"
-    "  imageUrl = imageNode;\n"
-    "}} else if (imageNode && typeof imageNode === 'object') {{\n"
-    "  // Object with nested fields\n"
-    "  imageUrl = imageNode.image_url || imageNode.image_data || imageNode.url;\n"
-    "}}\n\n"
-
-    "if (imageUrl) {{\n"
-    "  // Render image\n"
-    "}} else {{\n"
-    "  // Show friendly error with actual data for debugging\n"
-    "  console.warn('Unexpected image data format:', imageNode);\n"
-    "}}\n"
-    "```\n\n"
-
-    "Remember: **Schema is documentation, not reality. Code must handle reality.**\n\n"
-
     "NEVER show raw JSON to users. Always parse the data structure and create beautiful, intuitive visualizations.\n"
     "You have FULL CREATIVE FREEDOM to design the perfect rendering for each specific data type!\n\n"
+
+    "**Smart Component Selection Based on Output Schema**:\n"
+    "Analyze the output schema and choose the most user-friendly component for each data type:\n"
+    "- **Images/URLs**: Display as actual images with <img> tags, not text strings\n"
+    "- **Lists/Arrays**: Render as cards, grids, or tables - never show raw JSON arrays\n"
+    "- **Text content**: Use proper typography, headings, and paragraphs\n"
+    "- **Numbers/Metrics**: Display with visual indicators (progress bars, badges, charts)\n"
+    "- **Boolean/Status**: Show as colored badges or icons (✓/✗, 🟢/🔴)\n"
+    "- **Structured objects**: Create semantic layouts (not nested JSON)\n"
+    "- **Timestamps**: Format as human-readable dates (\"2 hours ago\", \"Jan 15, 2025\")\n\n"
+
+    "**Remember**: JSON is for machines. Non-programmers need visual, intuitive interfaces.\n"
+    "Transform technical data into beautiful, understandable components that tell a story.\n\n"
 
     "**Form Styling with RJSF**\n"
     "The default RJSF forms look outdated. Customize them to be modern and beautiful:\n"

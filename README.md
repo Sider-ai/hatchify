@@ -10,6 +10,12 @@
 
 [English](README_EN.md) | 简体中文
 
+---
+
+🌐 **在线体验**: [https://hatchify.ai/](https://hatchify.ai/) - 无需安装，立即尝试 Vibe Graph！
+
+---
+
 </div>
 
 ## 📖 简介
@@ -21,7 +27,7 @@ Hatchify 是一个强大的多智能体工作流平台，通过动态图执行�
 - 🤖 **动态多智能体编排**: 通过 JSON 配置动态构建和执行 Agent 工作流
 - 🔄 **智能路由系统**: 支持 Rules、JSONLogic、Router Agent、Orchestrator 等多种路由策略
 - 🔌 **MCP 协议集成**: 原生支持 Model Context Protocol，轻松扩展工具能力
-- 💬 **Web Builder**: 对话式 Web 应用生成，支持实时预览和部署
+- 💬 **Web Builder**: 对话式 Web 应用生成，支持实时预览和部署（完善中）
 - 📊 **事件驱动架构**: 基于 SSE 的实时事件流，完整追踪执行过程
 - 🗄️ **版本管理**: Graph 规范的版本快照与回滚支持
 - 🎯 **多模型支持**: 统一的 LLM 接口，支持 OpenAI、Gemini、Claude 等主流模型
@@ -289,7 +295,10 @@ terminate_on_close = true
 - 工具名前缀（避免命名冲突）
 - 动态启用/禁用服务器（`enabled` 字段）
 
-### 4. 🎨 Web Builder - Vibe 建站
+### 4. 🎨 Web Builder - Vibe 建站 🚧
+
+> **状态：正在实现中**
+> 该功能目前处于开发阶段，部分功能可能尚未完善。
 
 通过自然语言对话，让 AI 自动生成和定制 Web 应用，从需求描述到部署上线一站式完成。
 
