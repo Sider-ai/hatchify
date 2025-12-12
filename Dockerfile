@@ -17,7 +17,7 @@ RUN uv lock && uv sync --frozen --no-dev
 # ----------------------------
 FROM python:3.13.5-slim
 
-RUN apt-get update && apt-get install -y git
+RUN apt-get update && apt-get install -y git npm
 
 WORKDIR /app
 VOLUME /app/resources

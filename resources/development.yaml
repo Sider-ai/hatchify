@@ -37,7 +37,7 @@ hatchify:
         check_same_thread: False
         timeout: 30.0
   web_app_builder:
-    repo_url: git@github.com:Sider-ai/hatchify-web-app-template.git
+    repo_url: https://github.com/Sider-ai/hatchify-web-app-template.git
     branch: master
     workspace: ./data/workspace
     init_steps:
