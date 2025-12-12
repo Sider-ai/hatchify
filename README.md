@@ -90,6 +90,77 @@ python main.py
 
 访问 http://localhost:8000/docs 查看 API 文档。
 
+### Docker 部署
+
+#### 1. 构建镜像
+
+```bash
+docker build -t hatchify .
+```
+
+#### 2. 启动容器
+
+```bash
+# 后台运行，映射端口并挂载数据目录
+docker run -itd \
+  --name=hatchify \
+  -p 8000:8000 \
+  -v ./data:/app/data \
+  -v ./resources:/app/resources \
+  hatchify
+```
+
+**参数说明：**
+- `-p 8000:8000`: 将容器的 8000 端口映射到主机的 8000 端口
+- `-v ./data:/app/data`: 挂载数据目录（包含数据库、存储、会话等）
+- `-v ./resources:/app/resources`: 挂载配置文件目录（`mcp.toml`、`models.toml`、`development.yaml`）
+
+#### 3. 查看日志
+
+```bash
+# 实时查看日志
+docker logs -f hatchify
+
+# 查看最近 100 行日志
+docker logs --tail 100 hatchify
+```
+
+#### 4. 容器管理
+
+```bash
+# 停止容器
+docker stop hatchify
+
+# 启动容器
+docker start hatchify
+
+# 重启容器
+docker restart hatchify
+
+# 删除容器
+docker rm -f hatchify
+```
+
+#### 5. 环境变量配置
+
+可以通过环境变量覆盖配置：
+
+```bash
+docker run -itd \
+  --name=hatchify \
+  -p 8000:8000 \
+  -e HATCHIFY__SERVER__BASE_URL=https://your-domain.com \
+  -e HATCHIFY__SERVER__PORT=8000 \
+  -v ./data:/app/data \
+  -v ./resources:/app/resources \
+  hatchify
+```
+
+**注意事项：**
+- ⚠️ 生产部署时务必修改 `HATCHIFY__SERVER__BASE_URL` 为实际的外网地址
+- 确保 `./data` 和 `./resources` 目录存在且有正确的权限
+- 首次启动前需要先配置 `resources/mcp.toml` 和 `resources/models.toml`
+
 ## 📁 项目结构
 
 ```
