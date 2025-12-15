@@ -167,7 +167,7 @@ async def rollback_to_version(
         return Result.error(code=500, message=msg)
 
 
-@graphs_router.post("/stream/{graph_id}", response_model=Result[ExecutionResponse])
+@graphs_router.post("/stream", response_model=Result[ExecutionResponse])
 async def submit_stream_conversation(
         request: GraphConversationRequest,
         session: AsyncSession = Depends(get_db),
