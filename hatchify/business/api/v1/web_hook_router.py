@@ -98,7 +98,6 @@ async def invoke(
         service: GraphService = Depends(ServiceManager.get_service_dependency(GraphService)),
 ):
     result_dict = {}
-    session_id = uuid.uuid4().hex
     graph_spec = await service.get_graph_spec(session, graph_id)
     if not graph_spec:
         return Result.error(code=404, message=f"Graph '{graph_id}' not found")
@@ -110,7 +109,7 @@ async def invoke(
         tool_router=tool_factory,
         function_router=function_router,
         hooks=[GraphStateHook()],
-        session_manager=create_session_manager(graph_id=graph_id, session_id=session_id)
+        session_manager=create_session_manager(graph_id=graph_id, session_id=graph_id)
     )
 
     graph = builder.build_graph(graph_spec)

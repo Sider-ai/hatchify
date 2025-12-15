@@ -167,10 +167,9 @@ async def rollback_to_version(
         return Result.error(code=500, message=msg)
 
 
-@graphs_router.post("/stream", response_model=Result[ExecutionResponse])
+@graphs_router.post("/stream/{graph_id}", response_model=Result[ExecutionResponse])
 async def submit_stream_conversation(
         request: GraphConversationRequest,
-        graph_id: Optional[str] = Query(default=uuid.uuid4().hex),
         session: AsyncSession = Depends(get_db),
         graph_service: GraphService = Depends(ServiceManager.get_service_dependency(GraphService)),
         execution_service: ExecutionService = Depends(ServiceManager.get_service_dependency(ExecutionService)),
@@ -182,6 +181,11 @@ async def submit_stream_conversation(
     - 如果不提供 graph_id：自动创建新的 Graph 和 Session
     """
     try:
+        if request.graph_id:
+            graph_id = request.graph_id
+        else:
+            graph_id = uuid.uuid4().hex
+
         # 1. 获取或创建 Graph
         graph = await graph_service.get_by_id(session, graph_id)
 

@@ -23,6 +23,7 @@ class UpdateGraphRequest(BaseModel):
 
 
 class GraphConversationRequest(BaseModel):
+    graph_id: Optional[str] = Field(default=None)
     messages: Messages
     mode: ConversationMode = Field(
         default=ConversationMode.EDIT,
