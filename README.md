@@ -10,7 +10,7 @@ English | [简体中文](README_ZH.md)
 
 ---
 
-🌐 **Live Demo**: [https://hatchify.ai/](https://hatchify.ai/) - Try Vibe Graph instantly without installation!
+🌐 **Cloud Version**: [https://hatchify.ai/](https://hatchify.ai/) - Try Vibe Graph instantly without installation!
 
 ---
 
