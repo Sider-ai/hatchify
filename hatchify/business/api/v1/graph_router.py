@@ -21,6 +21,7 @@ from hatchify.common.domain.requests.graph import (
     UpdateGraphRequest,
     GraphConversationRequest,
 )
+from hatchify.common.domain.requests.graph_patch import GraphSpecPatchRequest
 from hatchify.common.domain.responses.graph_response import GraphResponse
 from hatchify.common.domain.responses.graph_version_response import GraphVersionResponse
 from hatchify.common.domain.responses.pagination import PaginationInfo
@@ -116,6 +117,29 @@ async def update_by_id(
         msg = str(e)
         logger.error(msg)
         return Result.error(code=400, message=msg)
+    except Exception as e:
+        msg = f"{type(e).__name__}: {str(e)}"
+        logger.error(msg)
+        return Result.error(code=500, message=msg)
+
+
+@graphs_router.patch("/{id}/spec", response_model=Result[GraphResponse])
+async def patch_graph_spec(
+        patch_request: GraphSpecPatchRequest,
+        _id: str = Path(default=..., alias="id"),
+        session: AsyncSession = Depends(get_db),
+        service: GraphService = Depends(ServiceManager.get_service_dependency(GraphService)),
+):
+    """
+    细粒度修改 GraphSpec
+    - agents.update: 更新 Agent 配置（model, instruction, tools）
+    """
+    try:
+        obj_tb: GraphTable = await service.patch_spec(session, _id, patch_request)
+        if not obj_tb:
+            return Result.error(code=500, message="Patch Graph Spec Failed")
+        response = GraphResponse.model_validate(obj_tb)
+        return Result.ok(data=response)
     except Exception as e:
         msg = f"{type(e).__name__}: {str(e)}"
         logger.error(msg)

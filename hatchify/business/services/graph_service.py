@@ -22,6 +22,7 @@ from hatchify.business.services.session_service import SessionService
 from hatchify.common.domain.entity.graph_spec import GraphSpec
 from hatchify.common.domain.enums.graph_version_type import GraphVersionType
 from hatchify.common.domain.enums.session_scene import SessionScene
+from hatchify.common.domain.requests.graph_patch import GraphSpecPatchRequest
 from hatchify.core.graph.dynamic_graph_builder import DynamicGraphBuilder
 from hatchify.core.manager.function_manager import function_router
 from hatchify.core.manager.tool_manager import tool_factory
@@ -511,6 +512,68 @@ class GraphService(GenericService[GraphTable]):
 
             return result
         except Exception as e:
+            if commit:
+                await session.rollback()
+            raise
+
+    async def patch_spec(
+            self,
+            session: AsyncSession,
+            graph_id: str,
+            patch_request: GraphSpecPatchRequest,
+            commit: bool = True
+    ) -> Optional[GraphTable]:
+        """
+        细粒度修改 GraphSpec
+        - agents.update: 更新 Agent 配置（model, instruction, tools）
+        - 修改后 current_version_id 设为 NULL（标记有未保存修改）
+        """
+        try:
+            graph = await self._repository.find_by_id(session, graph_id)
+            if not graph:
+                raise ValueError(f"Graph {graph_id} not found")
+
+            if not graph.current_spec:
+                raise ValueError(f"Graph {graph_id} has no spec")
+
+            # 解析当前 spec
+            spec_dict = dict(graph.current_spec)
+
+
+            if patch_request.agents and patch_request.agents.update:
+
+                agents_list = spec_dict.get("agents", [])
+                agent_index_map = {agent["name"]: i for i, agent in enumerate(agents_list)}
+
+                for agent_name, patch in patch_request.agents.update.items():
+                    if agent_name not in agent_index_map:
+                        raise ValueError(f"Agent '{agent_name}' not found in spec")
+
+                    idx = agent_index_map[agent_name]
+                    patch_data = patch.model_dump(exclude_none=True)
+
+                    # 合并更新
+                    for key, value in patch_data.items():
+                        agents_list[idx][key] = value
+
+                spec_dict["agents"] = agents_list
+
+            # 验证并更新
+            validated_spec = self._validate_spec(spec_dict)
+            update_data = {
+                "current_spec": validated_spec,
+                "current_version_id": None  # 标记有未保存修改
+            }
+
+            result = await self._repository.update_by_id(session, graph_id, update_data)
+
+            if commit:
+                await session.commit()
+                if result:
+                    await session.refresh(result)
+
+            return result
+        except Exception:
             if commit:
                 await session.rollback()
             raise
