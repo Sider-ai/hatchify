@@ -1,0 +1,46 @@
+.flowing-border {
+	position: relative;
+	overflow: hidden;
+	border-radius: 15px;
+	padding: 3px;
+	background: linear-gradient(
+		45deg,
+		#ff0000,
+		#ff7f00,
+		#ffff00,
+		#00ff00,
+		#0000ff,
+		#4b0082,
+		#9400d3,
+		#ff0000
+	);
+	background-size: 800% 800%;
+	animation: flow 4s ease-in-out infinite;
+}
+
+.flowing-border .inner {
+	background: #1a1a1a;
+	border-radius: 12px;
+	padding: 2rem;
+	color: white;
+	position: relative;
+	z-index: 1;
+}
+
+@keyframes flow {
+	0%,
+	100% {
+		background-position: 0% 50%;
+	}
+
+	50% {
+		background-position: 100% 50%;
+	}
+}
+
+.node-instructions-clamp {
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}

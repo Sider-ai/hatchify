@@ -1,0 +1,43 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs
+dist
+**/dist
+.vite
+.turbo
+
+# Development files
+.git
+.github
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test coverage
+coverage
+.nyc_output
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+.env*.local
+
+# Misc
+*.md
+!README.md
+.gitignore
+.editorconfig

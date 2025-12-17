@@ -1,0 +1,12 @@
+<svg
+  width="60"
+  height="60"
+  viewBox="0 0 60 60"
+  fill="currentColor"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path d="M29.125 29.1309H12.5V12.5059H29.125V29.1309Z" fill="#F1511B" />
+  <path d="M47.499 29.1278H30.874V12.5028H47.499V29.1278Z" fill="#80CC28" />
+  <path d="M29.125 47.5H12.5V30.875H29.125V47.5Z" fill="#00ADEF" />
+  <path d="M47.499 47.4969H30.874V30.8719H47.499V47.4969Z" fill="#FBBC09" />
+</svg>

@@ -1,0 +1,14 @@
+.cite-popover {
+  .ant-popover-inner {
+    display: flex !important;
+    align-items: stretch !important;
+    width: 320px !important;
+    height: 96px !important;
+    border-radius: 16px !important;
+    padding: 8px !important;
+  }
+
+  .ant-popover-inner-content {
+    flex: 1 1 0% !important;
+  }
+}

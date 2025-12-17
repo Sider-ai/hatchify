@@ -1,0 +1,396 @@
+{
+	"hello": "你好",
+	"home": {
+		"header": {
+			"main": "主页",
+			"upgrade": "升级"
+		},
+		"toolsSection": {
+			"supportedTools": "当前支持的工具"
+		},
+		"hero": {
+			"title": "多智能体",
+			"badge": "测试版",
+			"subtitle": "多智能体协作，智能倍增！",
+			"question": "你想要创建什么？"
+		},
+		"input": {
+			"placeholder": "今天你想创建什么？",
+			"promptOptimization": "提示词优化",
+			"errorPromptRequired": "请输入提示词",
+			"createWorkflowFailed": "创建工作流失败"
+		},
+		"history": {
+			"title": "我的AI应用",
+			"tabs": {
+				"myAiApp": "我的AI应用",
+				"community": "社区",
+				"tools": "工具"
+			}
+		},
+		"profile": {
+			"settings": "设置",
+			"logout": "退出登录",
+			"use": "使用",
+			"dashboard": "API 仪表板",
+			"pricing": "价格"
+		},
+		"renameModal": {
+			"title": "重命名",
+			"placeholder": "请输入新名称",
+			"unknownError": "未知错误",
+			"nameRequired": "名称不能为空"
+		},
+		"promptSuggestions": {
+			"githubTrending": "Github 趋势分析",
+			"flashcards": "智能抽认卡生成",
+			"seoCompetitor": "SEO 竞品分析"
+		}
+	},
+	"settings": {
+		"account": "账号",
+		"logout": "退出登录",
+		"displayLanguage": "显示语言",
+		"displayMode": "显示模式",
+		"dark": "暗色",
+		"light": "亮色",
+		"system": "跟随系统",
+		"setup": "设置",
+		"appearance": "外观",
+		"subscriptions": {
+			"title": "订阅",
+			"currentPlan": "当前套餐",
+			"automaticRenewal": "自动续费",
+			"cancel": "取消订阅",
+			"reactivate": "恢复订阅",
+			"quota": "额度",
+			"actions": "订阅操作",
+			"cancelSuccess": "订阅取消成功",
+			"reactivateSuccess": "订阅恢复成功",
+			"cancelTitle": "订阅取消",
+			"cancelConfirm": "确定要取消订阅吗？"
+		}
+	},
+	"login": {
+		"welcome": "欢迎",
+		"subtitle": "用 AI 创建应用和网站",
+		"google": "使用Google登录",
+		"microsoft": "使用Microsoft登录",
+		"haveAccount": "已有账号？",
+		"dontHaveAccount": "没有账号？",
+		"createAnAccount": "创建账号",
+		"logIn": "登录",
+		"register": "注册",
+		"loginTitle": "登录"
+	},
+	"loginEmail": {
+		"placeholder": "请输入你的工作邮箱",
+		"continue": "继续",
+		"or": "或",
+		"invalidEmail": "请输入有效邮箱",
+		"requestSent": "验证码已发送",
+		"requestFailed": "请求失败"
+	},
+	"verifyEmail": {
+		"title": "验证你的邮箱",
+		"sentTo": "验证码已发送至 {{email}}",
+		"notReceived": "没有收到？",
+		"resend": "重新发送",
+		"resendIn": "{{seconds}} 秒后可重发",
+		"sending": "发送中...",
+		"verifyCta": "注册 / 登录",
+		"verifying": "验证中...",
+		"loggedIn": "登录成功",
+		"sendSuccess": "验证码已发送",
+		"sendFailed": "发送失败",
+		"verifyFailed": "验证失败"
+	},
+	"dashboard": {
+		"title": "API 仪表板",
+		"tabs": {
+			"overview": "总览",
+			"project": "项目",
+			"apikey": "API 密钥"
+		},
+		"recharge": "充值",
+		"overview": {
+			"remaining": "剩余额度",
+			"consumed": "已消耗",
+			"usageProgress": "使用进度",
+			"consumptionStats": "消耗统计",
+			"last7": "近7天",
+			"last30": "近30天",
+			"custom": "自定义"
+		},
+		"project": {
+			"totalConsumption": "总消耗",
+			"last7": "近7天",
+			"last30": "近30天",
+			"projectConsumption": "项目消耗",
+			"custom": "自定义"
+		},
+		"apikey": {
+			"copied": "已复制",
+			"copy": "复制",
+			"show": "显示",
+			"hide": "隐藏"
+		}
+	},
+	"agentAction": {
+		"projectName": "项目名称",
+		"workflow": "工作流",
+		"webpage": "网页",
+		"websiteEditor": "网站编辑器",
+		"workflowEditor": "工作流编辑器",
+		"agents": "智能体",
+		"agentRunning": "智能体运行中…",
+		"createWebsite": "创建网站",
+		"updateWebsite": "更新网站",
+		"chat": "聊天",
+		"askAnything": "问我任何问题",
+		"stopGenerating": "停止生成",
+		"webCreatorLoading": "网站创建中...",
+		"refiningLoading": "优化中...",
+		"creatingWorkflow": "正在创建工作流...",
+		"loadWorkflowError": "加载工作流失败",
+		"loadWebCreatorError": "加载网站创建器失败",
+		"copiedToClipboard": "已复制到剪贴板",
+		"tipCounter": {
+			"message": "智能体创建完成，是否生成网页？",
+			"messageUpdate": "智能体优化完成，是否更新网页？",
+			"notNow": "暂不生成",
+			"generateNow": "立即生成",
+			"updateNow": "立即更新"
+		},
+		"publish": {
+			"button": {
+				"publish": "发布",
+				"updating": "更新中",
+				"publishing": "发布中...",
+				"published": "已发布",
+				"updated": "已更新"
+			},
+			"header": {
+				"title": "发布",
+				"description": "发布后，您的网站将可以被其他人访问。",
+				"tooltip": "AI 生成的网页可能包含功能缺陷或错误。如果在生产环境中使用，请先进行彻底检查和评估。"
+			},
+			"url": {
+				"tooltip": "URL"
+			},
+			"action": {
+				"unpublish": "取消发布",
+				"viewSite": "查看网站"
+			},
+			"share": {
+				"title": "分享"
+			},
+			"confirmUnpublish": {
+				"title": "取消发布",
+				"description": "取消发布后，您的网站将不再被其他人访问。"
+			},
+			"switch": {
+				"community": {
+					"label": "移除 Sider AI 徽章",
+					"tooltip": "使用 Sider AI 生成的网站将包含一个徽章，您可以选择将其移除"
+				},
+				"badge": {
+					"label": "在社区中隐藏",
+					"tooltip": "启用后，您生成的网站将不会在 Sider 社区中公开列出。只有拥有链接的用户才能访问它。"
+				},
+				"proTag": "高级版"
+			},
+			"remix": "二次创作"
+		}
+	},
+	"agentDetailModal": {
+		"input": "输入",
+		"settings": "设置",
+		"output": "输出",
+		"toolsets": "工具集",
+		"noTools": "暂无工具",
+		"systemPrompt": "系统提示",
+		"systemPromptPlaceholder": "请输入系统提示",
+		"updateSuccess": "更新成功",
+		"updateFailed": "更新失败，请重试",
+		"systemPromptRequired": "System Prompt 不能为空",
+		"ok": "确认",
+		"cancel": "取消",
+		"selectModel": "选择模型"
+	},
+	"agentToolsModal": {
+		"title": "添加工具",
+		"categories": "分类",
+		"all": "全部",
+		"searchPlaceholder": "搜索",
+		"add": "添加",
+		"added": "已添加"
+	},
+	"pricing": {
+		"selectPlanTitle": "选择订阅",
+		"month": "月付",
+		"year": "年度",
+		"noAvailablePlan": "暂无可用套餐",
+		"yearlyDiscount": "按年结算更优惠",
+		"features": {
+			"monthlyCredits": "每月额度",
+			"executionWallet": "执行钱包",
+			"workflows": "工作流数量"
+		},
+		"actions": {
+			"currentPlan": "当前套餐",
+			"checkout": "去结账",
+			"upgrade": "立即升级",
+			"subscribe": "立即订阅"
+		},
+		"tiers": {
+			"free": "免费",
+			"starter": "入门版",
+			"professional": "专业版",
+			"business": "企业版",
+			"Free": "免费",
+			"Starter": "入门版",
+			"Professional": "专业版",
+			"Business": "企业版"
+		},
+		"freeVersion": {
+			"title": "免费版：",
+			"giftedEachMonth": "每月赠送 {{count}} 积分"
+		},
+		"tierDescriptions": {
+			"default": "使用专业功能与企业级性能定制工作流，最大化价值。",
+			"Starter": "快速将想法变为可测试方案，低投入高效率。",
+			"Professional": "使用专业功能与企业级性能定制工作流，最大化价值。",
+			"Business": "自动化、协作并扩展，构建企业级工作流生态。"
+		}
+	},
+	"checkout": {
+		"title": "支付",
+		"ok": "确认支付",
+		"cancel": "取消",
+		"selected": "选择的套餐",
+		"priceToPay": "应付金额",
+		"enterCardInfo": "请输入卡片信息",
+		"stripeKeyMissing": "Stripe key 未配置",
+		"paymentMethodCreateFailed": "支付方式创建失败",
+		"createSuccess": "订阅创建成功",
+		"createFailed": "订阅创建失败",
+		"loadingPreview": "计算金额...",
+		"alreadyOnPlan": "您已在此套餐",
+		"alreadyOnPlanAction": "立即升级",
+		"listPrice": "列表价格",
+		"creditApplied": "当前套餐的额度",
+		"amountDueToday": "应付金额"
+	},
+	"recharge": {
+		"title": "充值钱包",
+		"ok": "确认充值",
+		"cancel": "取消",
+		"amountLabel": "充值金额（美元）",
+		"enterCardInfo": "请输入卡片信息",
+		"stripeKeyMissing": "Stripe key 未配置",
+		"paymentMethodCreateFailed": "支付方式创建失败",
+		"success": "充值成功",
+		"failed": "充值失败"
+	},
+	"webcreator": {
+		"error1": "当前网页有错误，请点击修复",
+		"pleaseFix": "请修复错误",
+		"header": {
+			"tabs": {
+				"code": "代码预览",
+				"desktop": "桌面预览",
+				"mobile": "移动端预览"
+			},
+			"actions": {
+				"fixIssues": "修复问题",
+				"back": "后退",
+				"forward": "前进",
+				"reload": "刷新"
+			},
+			"details": "详情"
+		}
+	},
+	"upgradeTip": {
+		"title": "获取更多额度",
+		"description": "您的积分已用完，升级以获取更多。",
+		"action": "立即升级"
+	},
+
+	"landing": {
+		"heroTitle": "孕育创意，放大价值",
+		"heroDesc": "以自然语言编排多个智能体，一键接入网站后台，快速实现 AI 驱动的功能页面",
+		"whatIsHatchify": "什么是 Hatchify？",
+		"communityTitle": "社区",
+		"communityDesc": "在社区中发现最佳实践"
+	},
+	"common": {
+		"cancel": "取消",
+		"delete": "删除",
+		"deleteConfirm": {
+			"title": "删除确认",
+			"description": "确定要删除这个项目吗？"
+		},
+		"confirm": "确认",
+		"loading": "加载中...",
+		"use": "使用",
+		"back": "返回",
+		"applyToUse": "申请使用",
+		"startNow": "立即开始"
+	},
+	"inviteCode": {
+		"title": "激活你的账号",
+		"subtitle": "测试通道已开放。邀请码是你通往未来世界的钥匙。",
+		"label": "邀请码",
+		"placeholder": "请输入你的邀请码",
+		"verify": "验证",
+		"noCode": "没有邀请码？",
+		"errorEmptyCode": "请输入你的邀请码"
+	},
+	"applyModal": {
+		"title": "申请使用 Hatchify",
+		"emailLabel": "你的邮箱",
+		"socialLabel": "社交媒体信息",
+		"socialPlaceholder": "添加社交媒体主页链接，如 Twitter、GitHub、LinkedIn 等",
+		"submit": "提交申请",
+		"submitting": "提交中..."
+	},
+	"applySuccess": {
+		"title": "申请已提交",
+		"desc": "我们正在处理你的邀请码申请。审核通过后，你会第一时间收到邮件通知。",
+		"ok": "我知道了"
+	},
+	"languages": {
+		"en": "English",
+		"zh_CN": "简体中文"
+	},
+	"supabase": {
+		"connect": "连接 Supabase",
+		"selectProjectForWorkflow": "为此工作流选择 Supabase 项目",
+		"connected": "✓ Supabase 已连接",
+		"pleaseSelectProject": "请选择一个项目",
+		"selectExistingProjectPlaceholder": "选择要链接的现有项目",
+		"createNewProjectTitle": "创建新项目",
+		"selectOrgPlaceholder": "选择组织",
+		"createProject": "新建项目",
+		"createProjectModalTitle": "创建 Supabase 项目",
+		"createdSuccess": "Supabase 项目已创建",
+		"projectNameLabel": "项目名称",
+		"projectNamePlaceholder": "输入项目名称",
+		"passwordModal": {
+			"title": "请保存数据库密码",
+			"ok": "已保存",
+			"copy": "复制",
+			"copied": "已复制到剪贴板",
+			"copyFailed": "复制失败，请手动复制",
+			"hint": "请妥善保存，该密码仅此一次可见。"
+		},
+		"linkedReadOnlyWarning": "已链接！数据库架构为只读。可使用现有表，但无法创建新表。",
+		"linkedFullControl": "已链接并具有完整的数据库控制权！",
+		"errors": {
+			"linkFailed": "链接项目失败",
+			"projectNameRequired": "请输入项目名",
+			"orgRequired": "请选择组织"
+		}
+	}
+}

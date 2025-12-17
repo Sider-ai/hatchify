@@ -1,0 +1,16 @@
+.brandButton {
+    background-color: rgba(0, 0, 0, 0.96);
+
+    & > span {
+        background: linear-gradient(
+            103deg,
+            #ffe3aa 5.37%,
+            #edf0ff 40.89%,
+            #aebeff 68.56%,
+            #bba3ff 91.14%
+        );
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+}

@@ -1,0 +1,20 @@
+.chatInput {
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* 滚动条滑块 */
+  &::-webkit-scrollbar-thumb {
+    background-color: #3a89ffaf;
+    border-radius: 2px;
+  }
+
+  /* 鼠标悬停时的滑块样式 */
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #3a89ff;
+  }
+}

@@ -1,0 +1,414 @@
+{
+	"hello": "Hi",
+	"home": {
+		"header": {
+			"main": "Main",
+			"upgrade": "Upgrade"
+		},
+		"toolsSection": {
+			"supportedTools": "Currently supported tools"
+		},
+		"hero": {
+			"title": "Multi Agents",
+			"badge": "Beta",
+			"subtitle": "Multi-Agent Collaboration, Intelligence Multiplied!",
+			"question": "What would you like to create?"
+		},
+		"input": {
+			"placeholder": "What do you want to create today?",
+			"promptOptimization": "Prompt optimization",
+			"errorPromptRequired": "Please enter a prompt",
+			"createWorkflowFailed": "Failed to create workflow"
+		},
+		"history": {
+			"title": "My AI APP",
+			"tabs": {
+				"myAiApp": "My AI APP",
+				"community": "Community",
+				"tools": "Tools"
+			}
+		},
+		"profile": {
+			"settings": "Settings",
+			"logout": "Log out",
+			"use": "Use",
+			"dashboard": "API Dashboard",
+			"pricing": "Pricing"
+		},
+		"renameModal": {
+			"title": "Rename",
+			"placeholder": "Enter new name",
+			"unknownError": "Unknown error",
+			"nameRequired": "Name cannot be empty"
+		},
+		"promptSuggestions": {
+			"githubTrending": "Github Trending Analysis",
+			"flashcards": "Smart Flashcard Generation",
+			"seoCompetitor": "SEO Competitor Analysis"
+		}
+	},
+	"settings": {
+		"account": "Account",
+		"logout": "Log out",
+		"displayLanguage": "Display Language",
+		"displayMode": "Display Mode",
+		"dark": "Dark",
+		"light": "Light",
+		"system": "System",
+		"setup": "Set up",
+		"appearance": "Appearance",
+		"subscriptions": {
+			"title": "Subscriptions",
+			"currentPlan": "Current Plan",
+			"automaticRenewal": "Automatic Renewal",
+			"cancel": "Unsubscribe",
+			"reactivate": "Resume Subscription",
+			"quota": "Quota",
+			"actions": "Actions",
+			"cancelSuccess": "Subscription canceled successfully",
+			"reactivateSuccess": "Subscription resumed successfully",
+			"cancelTitle": "Cancel Subscription",
+			"cancelConfirm": "Are you sure you want to cancel the subscription?"
+		}
+	},
+	"login": {
+		"welcome": "Welcome",
+		"subtitle": "Create apps and websites with AI",
+		"google": "Continue with Google",
+		"microsoft": "Continue with Microsoft",
+		"haveAccount": "Already have an account?",
+		"dontHaveAccount": "Don't have an account?",
+		"createAnAccount": "Create an account",
+		"logIn": "Log in",
+		"loginTitle": "Login",
+		"register": "Register"
+	},
+	"loginEmail": {
+		"placeholder": "Enter your work email",
+		"continue": "Continue",
+		"or": "or",
+		"invalidEmail": "Please enter a valid email",
+		"requestSent": "Verification code sent",
+		"requestFailed": "Request failed"
+	},
+	"verifyEmail": {
+		"title": "Verify your email",
+		"sentTo": "We sent a code to {{email}}",
+		"notReceived": "Didn't receive it?",
+		"resend": "Resend",
+		"resendIn": "Resend in {{seconds}}s",
+		"sending": "Sending...",
+		"verifyCta": "Sign up / Login",
+		"verifying": "Verifying...",
+		"loggedIn": "Logged in",
+		"sendSuccess": "Verification code sent",
+		"sendFailed": "Send failed",
+		"verifyFailed": "Verify failed"
+	},
+	"dashboard": {
+		"title": "API Dashboard",
+		"tabs": {
+			"overview": "Overview",
+			"project": "Project",
+			"apikey": "API key"
+		},
+		"recharge": "Recharge",
+		"overview": {
+			"remaining": "Remaining quota",
+			"consumed": "Consumed",
+			"usageProgress": "Usage progress",
+			"consumptionStats": "Consumption Statistics",
+			"last7": "Last 7 days",
+			"last30": "Last 30 days",
+			"custom": "Customization"
+		},
+		"project": {
+			"totalConsumption": "Total Consumption",
+			"last7": "Last 7 days",
+			"last30": "Last 30 days",
+			"projectConsumption": "Project Consumption",
+			"custom": "Customization"
+		},
+		"apikey": {
+			"copied": "Copied",
+			"copy": "Copy",
+			"show": "Show",
+			"hide": "Hide"
+		}
+	},
+	"agentAction": {
+		"projectName": "Name of the project",
+		"workflow": "Workflow",
+		"webpage": "Webpage",
+		"websiteEditor": "Website Editor",
+		"workflowEditor": "Workflow Editor",
+		"agents": "Agents",
+		"agentRunning": "Agent running…",
+		"createWebsite": "Create Website",
+		"updateWebsite": "Update Website",
+		"chat": "Chat",
+		"askAnything": "Ask anything",
+		"stopGenerating": "Stop generating",
+		"webCreatorLoading": "WebCreator ...",
+		"refiningLoading": "Refining ...",
+		"creatingWorkflow": "Creating workflow...",
+		"loadWorkflowError": "Failed to load workflow",
+		"loadWebCreatorError": "Failed to load web creator",
+		"copiedToClipboard": "Copied to clipboard",
+		"tipCounter": {
+			"message": "Agents creation complete, do you want to generate the website?",
+			"messageUpdate": "Agents refinement complete, do you want to update the website?",
+			"notNow": "Not now",
+			"generateNow": "Generate now",
+			"updateNow": "Update now"
+		},
+		"publish": {
+			"button": {
+				"publish": "Publish",
+				"updating": "Updating",
+				"publishing": "Publishing...",
+				"published": "Published",
+				"updated": "Updated"
+			},
+			"header": {
+				"title": "Publish",
+				"description": "After publishing, your website will be accessible to others.",
+				"tooltip": "AI-generated pages may contain functional issues or errors. Thoroughly review and evaluate before using in production."
+			},
+			"url": {
+				"tooltip": "URL"
+			},
+			"action": {
+				"unpublish": "Unpublish",
+				"viewSite": "View site",
+				"republish": "Republish",
+				"republishing": "Republishing...",
+				"publishSuccess": "Publish success"
+			},
+			"share": {
+				"title": "Share"
+			},
+			"confirmUnpublish": {
+				"title": "Unpublish",
+				"description": "After unpublishing, your website will no longer be accessible to others."
+			},
+			"switch": {
+				"community": {
+					"label": "Remove Sider AI badge",
+					"tooltip": "Websites generated with Sider AI include a badge. You can choose to remove it."
+				},
+				"badge": {
+					"label": "Hide in community",
+					"tooltip": "When enabled, your generated website will not be publicly listed in the Sider community. Only users with the link can access it."
+				},
+				"proTag": "Pro"
+			},
+			"remix": "Remix"
+		}
+	},
+	"agentDetailModal": {
+		"input": "Input",
+		"settings": "Settings",
+		"output": "Out",
+		"toolsets": "Toolsets",
+		"noTools": "No tools",
+		"systemPrompt": "System Prompt",
+		"systemPromptPlaceholder": "Please enter System Prompt",
+		"updateSuccess": "Update success",
+		"updateFailed": "Update failed, please try again",
+		"systemPromptRequired": "System Prompt cannot be empty",
+		"ok": "Confirm",
+		"cancel": "Cancel",
+		"selectModel": "Select model"
+	},
+	"agentToolsModal": {
+		"title": "Add Tools",
+		"categories": "Categories",
+		"all": "All",
+		"searchPlaceholder": "Search",
+		"add": "Add",
+		"added": "Added"
+	},
+	"pricing": {
+		"selectPlanTitle": "Choose a plan",
+		"month": "Monthly",
+		"year": "Yearly",
+		"noAvailablePlan": "No plans available",
+		"yearlyDiscount": "Save with annual billing",
+		"features": {
+			"monthlyCredits": "Monthly credits",
+			"executionWallet": "Execution wallet",
+			"workflows": "Workflows"
+		},
+		"actions": {
+			"currentPlan": "Current Plan",
+			"checkout": "Checkout",
+			"upgrade": "Upgrade Now",
+			"subscribe": "Subscribe Now"
+		},
+		"tiers": {
+			"free": "Free",
+			"starter": "Starter",
+			"professional": "Professional",
+			"business": "Business",
+			"Free": "Free",
+			"Starter": "Starter",
+			"Professional": "Professional",
+			"Business": "Business"
+		},
+		"freeVersion": {
+			"title": "Free Version: ",
+			"giftedEachMonth": "{{count}} credits gifted each month"
+		},
+		"tierDescriptions": {
+			"default": "Customize workflows with pro features and enterprise performance for maximum value.",
+			"Starter": "Turn ideas into testable solutions fast with low effort and high efficiency.",
+			"Professional": "Customize workflows with pro features and enterprise performance for maximum value.",
+			"Business": "Automate, collaborate, and scale with an enterprise-grade workflow ecosystem."
+		}
+	},
+	"checkout": {
+		"title": "Payment",
+		"ok": "Confirm payment",
+		"cancel": "Cancel",
+		"selected": "Selected plan",
+		"priceToPay": "Amount due",
+		"enterCardInfo": "Enter card information",
+		"stripeKeyMissing": "Stripe key is not configured",
+		"paymentMethodCreateFailed": "Failed to create payment method",
+		"createSuccess": "Subscription created successfully",
+		"createFailed": "Failed to create subscription",
+		"loadingPreview": "Calculating amount...",
+		"alreadyOnPlan": "You are already on this plan",
+		"alreadyOnPlanAction": "Upgrade now",
+		"listPrice": "List price",
+		"creditApplied": "Credit from current plan",
+		"amountDueToday": "Amount due today"
+	},
+	"recharge": {
+		"title": "Recharge Wallet",
+		"ok": "Confirm recharge",
+		"cancel": "Cancel",
+		"amountLabel": "Amount (USD)",
+		"enterCardInfo": "Enter card information",
+		"stripeKeyMissing": "Stripe key is not configured",
+		"paymentMethodCreateFailed": "Failed to create payment method",
+		"success": "Recharge successful",
+		"failed": "Recharge failed"
+	},
+	"webcreator": {
+		"error1": "The current webpage has an error. Please click to fix it.",
+		"pleaseFix": "Please fix the error",
+		"embed": {
+			"embed": "Embed",
+			"embedding": "Embedding...",
+			"embedThisPage": "Embed this page",
+			"directURL": "Direct URL",
+			"unembed": "Unembed",
+			"embedded": "Embedded"
+		},
+		"header": {
+			"tabs": {
+				"code": "Code Preview",
+				"desktop": "Desktop Preview",
+				"mobile": "Mobile Preview"
+			},
+			"actions": {
+				"fixIssues": "Fix issues",
+				"back": "Back",
+				"forward": "Forward",
+				"reload": "Reload"
+			},
+			"details": "Details"
+		}
+	},
+	"upgradeTip": {
+		"title": "Get More Credits",
+		"description": "You have used up all your credits. Upgrade to get more.",
+		"action": "Upgrade Now"
+	},
+	"chat": {
+		"reasoning": "Reasoning",
+		"ReasoningCompleted": "Reasoning Completed",
+		"write": "Write",
+		"replace": "Replace",
+		"delete": "Delete"
+	},
+
+	"landing": {
+		"heroTitle": "Hatch ideas, amplify value",
+		"heroDesc": "Orchestrate multiple intelligent agents with natural language, integrate them into website backend with one click, rapidly implement AI-driven functional pages",
+		"whatIsHatchify": "What is Hatchify?",
+		"communityTitle": "Community",
+		"communityDesc": "Discover Best Practices in the Community"
+	},
+	"common": {
+		"cancel": "Cancel",
+		"delete": "Delete",
+		"deleteConfirm": {
+			"title": "Delete Confirm",
+			"description": "Are you sure you want to delete this item?"
+		},
+		"confirm": "Confirm",
+		"loading": "Loading...",
+		"use": "Use",
+		"back": "Back",
+		"applyToUse": "Apply to Use",
+		"startNow": "Start Now"
+	},
+	"inviteCode": {
+		"title": "Activate your account",
+		"subtitle": "The beta channel is now open. The invitation code is your key to enter the future world.",
+		"label": "Invitation Code",
+		"placeholder": "Please enter your code",
+		"verify": "Verification",
+		"noCode": "Don't have a Invitation Code?",
+		"errorEmptyCode": "Please enter your code"
+	},
+	"applyModal": {
+		"title": "Apply for Use Hatchify",
+		"emailLabel": "Your Email",
+		"socialLabel": "Social Media Information",
+		"socialPlaceholder": "Add social media profile links such as Twitter, GitHub, LinkedIn, etc.",
+		"submit": "Submit Application",
+		"submitting": "Submitting..."
+	},
+	"applySuccess": {
+		"title": "Application Submitted",
+		"desc": "We are processing your invitation code application. Once approved, you will receive an email notification right away.",
+		"ok": "Got it"
+	},
+	"languages": {
+		"en": "English",
+		"zh_CN": "Simplified Chinese"
+	},
+	"supabase": {
+		"connect": "Connect Supabase",
+		"selectProjectForWorkflow": "Select a Supabase project for this workflow",
+		"connected": "✓ Supabase connected",
+		"pleaseSelectProject": "Please select a project",
+		"selectExistingProjectPlaceholder": "Select an existing project to link",
+		"createNewProjectTitle": "Create new project",
+		"selectOrgPlaceholder": "Select organization",
+		"createProject": "Create Project",
+		"createProjectModalTitle": "Create Supabase Project",
+		"createdSuccess": "Supabase project created",
+		"projectNameLabel": "Project name",
+		"projectNamePlaceholder": "Enter project name",
+		"passwordModal": {
+			"title": "Please save the database password",
+			"ok": "Saved",
+			"copy": "Copy",
+			"copied": "Copied to clipboard",
+			"copyFailed": "Copy failed, please copy manually",
+			"hint": "Please store it securely. This password is only visible once."
+		},
+		"linkedReadOnlyWarning": "Linked! Database schema is read-only. Existing tables can be used but new tables cannot be created.",
+		"linkedFullControl": "Linked with full database control!",
+		"errors": {
+			"linkFailed": "Failed to link project",
+			"projectNameRequired": "Please enter a project name",
+			"orgRequired": "Please select an organization"
+		}
+	}
+}

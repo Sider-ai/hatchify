@@ -1,0 +1,24 @@
+@mixin blink-cursor() {
+  animation: blink 1s steps(5, start) infinite;
+  animation: pulseSize 1.25s ease-in-out infinite;
+  content: "●";
+  display: inline-flex;
+  font-size: 12px;
+  font-family: "Noto Sans SC";
+  margin-inline-start: 0.25em;
+  vertical-align: baseline;
+}
+
+.blinkContainer {
+  :global(.markdown-body) {
+    & > :not(ol):not(ul):not(pre):not(.table-with-header):not(.code-block-inner):last-child,
+        & > ol:last-child > li:last-child,
+        // & > pre:last-child code,
+        & > ul:last-child > li:last-child,
+        & > p:last-child {
+      &::after {
+        @include blink-cursor;
+      }
+    }
+  }
+}
