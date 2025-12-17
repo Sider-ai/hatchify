@@ -22,3 +22,8 @@ dependencies = [
     "strands-agents-tools>=0.2.16",
     "uvicorn>=0.38.0",
 ]
+
+[project.optional-dependencies]
+volcengine = [
+    "volcengine-python-sdk[ark]>=4.0.43",
+]

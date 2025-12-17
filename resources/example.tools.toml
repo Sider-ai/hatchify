@@ -11,3 +11,29 @@
 enabled = false
 model = "gemini-3-pro-image-preview"
 api_key = ""
+
+# ============================================
+# Seed Dance Tool (Doubao)
+# ============================================
+[seed_dance]
+enabled = false
+model = "doubao-seedance-1-0-pro-250528"
+api_key = ""
+
+# ============================================
+# Seed Dream Tool (Doubao)
+# ============================================
+[seed_dream]
+enabled = false
+model = "doubao-seedream-4-0-250828"
+api_key = ""
+
+# ============================================
+# DouBao TTS Tool
+# ============================================
+[dou_bao_tts]
+enabled = false
+url = "https://openspeech.bytedance.com/api/v3/tts/unidirectional"
+resource_id = "volc.service_type.10029"
+speaker = "zh_male_beijingxiaoye_emo_v2_mars_bigtts"
+api_key = ""

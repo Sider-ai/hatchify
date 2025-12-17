@@ -33,8 +33,69 @@ class NanoBananaCardPreDefined(BasePreDefinedToolCard):
         return self
 
 
+class SeedDanceCardPreDefined(BasePreDefinedToolCard):
+    model: str = Field(
+        default="doubao-seedance-1-0-pro-250528",
+        description="DouBao model name for video generation",
+    )
+    api_key: Optional[str] = Field(default=None, description="DouBao (Volcengine Ark) API key")
+
+    @model_validator(mode="after")
+    def validate_enabled_config(self):
+        """Validate required fields when enabled"""
+        if self.enabled:
+            if not self.api_key or self.api_key.strip() == "":
+                raise ValueError(
+                    "dou_bao: api_key is required when enabled=true"
+                )
+        return self
+
+class SeedDreamCardPreDefined(BasePreDefinedToolCard):
+    model: str = Field(
+        default="doubao-seedream-4-0-250828",
+        description="DouBao model name for image generation",
+    )
+    api_key: Optional[str] = Field(default=None, description="DouBao (Volcengine Ark) API key")
+
+    @model_validator(mode="after")
+    def validate_enabled_config(self):
+        """Validate required fields when enabled"""
+        if self.enabled:
+            if not self.api_key or self.api_key.strip() == "":
+                raise ValueError(
+                    "dou_bao: api_key is required when enabled=true"
+                )
+        return self
+
+
+class DouBaoTTSCardPreDefined(BasePreDefinedToolCard):
+    url: str = Field(
+        default="https://openspeech.bytedance.com/api/v3/tts/unidirectional",
+        description="DouBao TTS API endpoint URL",
+    )
+    resource_id: Optional[str] = Field(default="volc.service_type.10029", description="DouBao TTS resource ID")
+    speaker: Optional[str] = Field(default="zh_male_beijingxiaoye_emo_v2_mars_bigtts", description="Speaker name")
+    api_key: Optional[str] = Field(default=None, description="DouBao TTS API key")
+
+    @model_validator(mode="after")
+    def validate_enabled_config(self):
+        """Validate required fields when enabled"""
+        if self.enabled:
+            if not self.api_key or self.api_key.strip() == "":
+                raise ValueError(
+                    "dou_bao_tts: api_key is required when enabled=true"
+                )
+            if not self.resource_id or self.resource_id.strip() == "":
+                raise ValueError(
+                    "dou_bao_tts: resource_id is required when enabled=true"
+                )
+        return self
+
 class PreDefinedToolsConfig(BaseModel):
     nano_banana: Optional[NanoBananaCardPreDefined] = None
+    seed_dance: Optional[SeedDanceCardPreDefined] = None
+    seed_dream: Optional[SeedDreamCardPreDefined] = None
+    dou_bao_tts: Optional[DouBaoTTSCardPreDefined] = None
 
 
 class PreDefinedToolManager(BaseModel):

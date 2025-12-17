@@ -62,7 +62,24 @@ async def async_load_pre_defined_tools():
         tool_factory.include_router(nano_banana_router)
         logger.info("Loaded predefined tool: nano_banana")
 
-    # Add more predefined tools here as needed
+    if pre_defined_tools_config.seed_dance and pre_defined_tools_config.seed_dance.enabled:
+        from hatchify.core.graph.tools.dou_bao_seed_dance_tool import seed_dance_router
+
+        tool_factory.include_router(seed_dance_router)
+        logger.info("Loaded predefined tool: seed_dance")
+
+    if pre_defined_tools_config.seed_dream and pre_defined_tools_config.seed_dream.enabled:
+        from hatchify.core.graph.tools.dou_bao_deed_dream_tool import seed_dream_router
+
+        tool_factory.include_router(seed_dream_router)
+        logger.info("Loaded predefined tool: seed_dream")
+
+    if pre_defined_tools_config.dou_bao_tts and pre_defined_tools_config.dou_bao_tts.enabled:
+        from hatchify.core.graph.tools.dou_bao_tts_tool import dou_bao_tts_router
+
+        tool_factory.include_router(dou_bao_tts_router)
+        logger.info("Loaded predefined tool: dou_bao_tts")
+
 
 
 tool_factory.include_router(math_router)
