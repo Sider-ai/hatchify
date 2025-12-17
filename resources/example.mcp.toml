@@ -14,16 +14,13 @@ enabled = true
 command = "npx"
 args = ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]
 prefix = "fs"
-
 # 可选: 工作目录和编码设置 (与 command/args 同级)
 cwd = "/tmp"
 encoding = "utf-8"
 encoding_error_handler = "strict"
-
 # 可选: 环境变量
 [servers.env]
 NODE_ENV = "production"
-
 
 [[servers]]
 name = "aws-docs"
@@ -32,10 +29,32 @@ enabled = false
 command = "uvx"
 args = ["awslabs.aws-documentation-mcp-server@latest"]
 prefix = "aws"
-
 # 可选: 工具过滤器
 [servers.tool_filters]
 allowed = ["search_documentation", "read_documentation"]
+
+
+
+# --------------------------------------------
+# StreamableHTTP 类型示例
+# 适用于基于 HTTP 的 MCP 服务器
+# --------------------------------------------
+[[servers]]
+name = "context7"
+transport = "streamablehttp"
+enabled = false
+url = "https://mcp.context7.com/mcp"
+prefix = "context7"
+
+# 可选: 超时和连接设置 (必须在 headers 之前)
+timeout = 30
+sse_read_timeout = 300
+terminate_on_close = true
+
+# 可选: HTTP headers
+[servers.headers]
+Authorization = "Bearer your-token"
+
 
 
 # --------------------------------------------
@@ -43,11 +62,11 @@ allowed = ["search_documentation", "read_documentation"]
 # 适用于 Server-Sent Events 协议
 # --------------------------------------------
 [[servers]]
-name = "calculator-sse"
+name = "demo-sse"
 transport = "sse"
 enabled = false
 url = "http://localhost:8000/sse"
-prefix = "calc"
+prefix = "demo"
 
 # 可选: 超时设置 (必须在 headers 之前)
 timeout = 5
@@ -58,26 +77,6 @@ sse_read_timeout = 300
 Authorization = "Bearer your-token"
 X-Custom-Header = "value"
 
-
-# --------------------------------------------
-# StreamableHTTP 类型示例
-# 适用于基于 HTTP 的 MCP 服务器
-# --------------------------------------------
-[[servers]]
-name = "weather-api"
-transport = "streamablehttp"
-enabled = false
-url = "http://localhost:8001/mcp/"
-prefix = "weather"
-
-# 可选: 超时和连接设置 (必须在 headers 之前)
-timeout = 30
-sse_read_timeout = 300
-terminate_on_close = true
-
-# 可选: HTTP headers
-[servers.headers]
-Authorization = "Bearer your-token"
 
 
 # ============================================

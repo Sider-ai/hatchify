@@ -1,0 +1,13 @@
+# ============================================
+# Predefined Tools Configuration
+# ============================================
+# This file configures built-in tools provided by Hatchify.
+# Copy this file to tools.toml and configure as needed.
+
+# ============================================
+# Nano Banana Tool (Gemini)
+# ============================================
+[nano_banana]
+enabled = false
+model = "gemini-3-pro-image-preview"
+api_key = ""

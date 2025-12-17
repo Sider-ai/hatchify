@@ -3,13 +3,13 @@ import asyncio
 from loguru import logger
 
 from hatchify.core.factory.tool_factory import ToolRouter
-from hatchify.core.manager.mcp_manager import mcp_manager
-from hatchify.core.mcp.mcp_tool_loader import MCPToolLoader
 from hatchify.core.graph.tools.math_tool import math_router
+from hatchify.core.manager.mcp_manager import mcp_manager
+from hatchify.core.manager.predefined_tool_manager import get_pre_defined_tool_configs
+from hatchify.core.mcp.mcp_tool_loader import MCPToolLoader
 
 tool_factory = ToolRouter()
-
-tool_factory.include_router(math_router)
+pre_defined_tools_config = get_pre_defined_tool_configs()
 
 
 def load_strands_tools():
@@ -52,3 +52,17 @@ async def async_load_mcp_server():
         for tool in mcp_tools:
             tool_factory.register(tool)
             logger.info(tool.tool_name)
+
+
+async def async_load_pre_defined_tools():
+    """Load predefined tools based on configuration"""
+    if pre_defined_tools_config.nano_banana and pre_defined_tools_config.nano_banana.enabled:
+        from hatchify.core.graph.tools.nano_banana_tool import nano_banana_router
+
+        tool_factory.include_router(nano_banana_router)
+        logger.info("Loaded predefined tool: nano_banana")
+
+    # Add more predefined tools here as needed
+
+
+tool_factory.include_router(math_router)

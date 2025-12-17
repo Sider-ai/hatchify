@@ -5,7 +5,7 @@ Demonstrates:
 2. How to auto-generate output schema from tool's return transport
 """
 
-from strands import ToolContext, tool
+from strands import tool
 from strands.tools.decorator import DecoratedFunctionTool
 
 from hatchify.core.factory.tool_factory import ToolRouter
@@ -14,14 +14,13 @@ from hatchify.core.factory.tool_factory import ToolRouter
 math_router = ToolRouter[DecoratedFunctionTool]()
 
 
-@tool(name="add", description="Add two numbers", context=True)
-async def add(a: float, b: float, tool_context: ToolContext) -> float:
+@tool(name="add", description="Add two numbers")
+async def add(a: float, b: float) -> float:
     """Add two numbers together.
 
     Args:
         a: First number
         b: Second number
-        tool_context: Tool execution context
 
     Returns:
         Sum of a and b

@@ -56,6 +56,7 @@ uv sync
 ```bash
 cp resources/example.mcp.toml resources/mcp.toml
 cp resources/example.models.toml resources/models.toml
+cp resources/example.tools.toml resources/tools.toml
 ```
 
 2. **Edit model configuration** (`resources/models.toml`)
@@ -67,7 +68,15 @@ api_key = "your-api-key-here"
 api_base = "https://api.openai.com/v1"
 ```
 
-3. **Edit MCP server configuration** (`resources/mcp.toml`) (optional)
+3. **Edit predefined tools configuration** (`resources/tools.toml`) (optional)
+```toml
+[nano_banana]
+enabled = true
+model = "gemini-3-pro-image-preview"
+api_key = "your-google-genai-api-key"
+```
+
+4. **Edit MCP server configuration** (`resources/mcp.toml`) (optional)
 ```toml
 [[servers]]
 name = "filesystem"
@@ -678,6 +687,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For questions or feedback, please open an issue on GitHub.
 
+## Star History
+
+<a href="https://www.star-history.com/#Sider-ai/hatchify&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Sider-ai/hatchify&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Sider-ai/hatchify&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Sider-ai/hatchify&type=date&legend=top-left" />
+ </picture>
+</a>
 ---
 
 Made with ❤️ by Sider.ai

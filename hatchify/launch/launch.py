@@ -20,16 +20,19 @@ from hatchify.business.api.v1.graph_router import graphs_router
 from hatchify.business.api.v1.graph_version_router import graph_versions_router
 from hatchify.business.api.v1.message_router import messages_router
 from hatchify.business.api.v1.models_router import model_router
+from hatchify.business.api.v1.opendal_router import opendal_router
 from hatchify.business.api.v1.session_router import sessions_router
 from hatchify.business.api.v1.tool_router import tool_router
 from hatchify.business.api.v1.web_builder_router import web_builder_router
 from hatchify.business.api.v1.web_hook_router import web_hook_router
 from hatchify.business.db.session import init_db
 from hatchify.business.middleware.preview_middleware import PreviewMiddleware
+from hatchify.common.domain.enums.storage_type import StorageType
 from hatchify.common.domain.result.result import Result
 from hatchify.common.extensions.ext_storage import init_storage
 from hatchify.common.settings.settings import get_hatchify_settings
-from hatchify.core.manager.tool_manager import async_load_mcp_server, async_load_strands_tools
+from hatchify.core.manager.tool_manager import async_load_mcp_server, async_load_strands_tools, \
+    async_load_pre_defined_tools
 
 hatchify_settings = get_hatchify_settings()
 
@@ -41,6 +44,7 @@ async def initialize_extensions():
     await asyncio.gather(
         async_load_mcp_server(),
         async_load_strands_tools(),
+        async_load_pre_defined_tools(),
         init_storage(),
     )
 
@@ -103,3 +107,7 @@ app.include_router(web_builder_router, prefix="/api", tags=["web_builder"])
 app.include_router(tool_router, prefix="/api", tags=["tools"])
 app.include_router(model_router, prefix="/api", tags=["models"])
 app.include_router(executions_router, prefix="/api", tags=["executions"])
+
+# 挂载 OpenDAL 文件访问路由（用于提供存储文件的 HTTP 访问）
+if hatchify_settings.storage.platform == StorageType.LOCAL:
+    app.include_router(opendal_router, tags=["opendal"])

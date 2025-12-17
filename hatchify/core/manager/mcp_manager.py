@@ -5,7 +5,7 @@ from __future__ import annotations
 import tomllib
 from pathlib import Path
 from typing import Dict, List, Optional
-
+from loguru import logger
 from pydantic import BaseModel
 
 from hatchify.common.constants.constants import Constants
@@ -39,11 +39,14 @@ class MCPManager(BaseModel):
 
     @classmethod
     def parse_toml(cls, path: str | Path) -> MCPManager:
-        data = tomllib.loads(Path(path).read_text())
-        servers_list = data.get("servers", [])
-        servers_dict = {server["name"]: server for server in servers_list}
+        try:
+            data = tomllib.loads(Path(path).read_text())
+            servers_list = data.get("servers", [])
+            servers_dict = {server["name"]: server for server in servers_list}
 
-        return cls(servers=servers_dict)
-
+            return cls(servers=servers_dict)
+        except Exception as e:
+            logger.error(f"Failed to parse predefined tools config: {e}")
+            return cls(servers={})
 
 mcp_manager: MCPManager = MCPManager.parse_toml(Constants.Path.McpToml)

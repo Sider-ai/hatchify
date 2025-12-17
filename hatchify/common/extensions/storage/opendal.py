@@ -33,15 +33,19 @@ class OpenDalStorage(BaseStorage):
                 "root": root
             })
         op = opendal.AsyncOperator(scheme=settings.storage.opendal.opendal_schema, **kwargs)
+
         retry_layer = opendal.layers.RetryLayer(max_times=3, factor=2.0, jitter=True)
-        return op.layer(retry_layer)
+        mime_layer = opendal.layers.MimeGuessLayer()
+        return op.layer(retry_layer).layer(mime_layer)
 
     async def save(self, key, data, mimetype='application/octet-stream'):
-        await self.client.write(path=self.__wrapper_folder_key(key), bs=data, content_type=mimetype)
+        oss_key = self.__wrapper_folder_key(key)
+        async with await self.client.open(path=oss_key, mode="wb", content_type=mimetype) as file:
+            await file.write(data)
 
     async def upload_file(self, key, path, mimetype='application/octet-stream'):
         async with aiofiles.open(path, mode='rb') as f:
-            await self.save(self.__wrapper_folder_key(key), await f.read(), mimetype=mimetype)
+            await self.save(key, await f.read(), mimetype=mimetype)
 
     async def load_once(self, key: str) -> bytes:
         oss_key = self.__wrapper_folder_key(key)
@@ -56,12 +60,9 @@ class OpenDalStorage(BaseStorage):
             raise FileNotFoundError("File not found")
 
         async def generate() -> AsyncGenerator[bytes, None]:
-            try:
-                file = await self.client.open(path=oss_key, mode="rb")
+            async with await self.client.open(path=oss_key, mode="rb") as file:
                 while chunk := await file.read(chunk_size):
                     yield chunk
-            except Exception as e:
-                raise e
 
         return generate()
 
@@ -90,7 +91,21 @@ class OpenDalStorage(BaseStorage):
             return False
 
     async def get_pre_signed_url(self, key: str, expires_in: int = 3600) -> str:
-        raise NotImplementedError('opendal fs schema unsupported pre_signed_url')
+        oss_key = self.__wrapper_folder_key(key)
+        logger.warning(
+            "OpenDAL backend lacks pre-sign capability. "
+            "Falling back to public URL construction. (Recommended for Dev Only)"
+        )
+        return f"{settings.server.base_url.rstrip('/')}/opendal/{oss_key.lstrip('/')}"
+
+    async def stat(self, key: str):
+        """获取文件元数据"""
+        oss_key = self.__wrapper_folder_key(key)
+        try:
+            return await self.client.stat(path=oss_key)
+        except Exception as e:
+            logger.error(e)
+            raise FileNotFoundError("File not found")
 
     def __wrapper_folder_key(self, key: str) -> str:
         wrapper_bucket_key = f'{self.bucket_name}/{key}'

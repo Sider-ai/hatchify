@@ -10,6 +10,7 @@ class Constants:
         ResourcesPath: str = os.path.join(RootPath, "resources")
         ModelPath: str = os.path.join(ResourcesPath, "models.toml")
         McpToml: str = os.path.join(ResourcesPath, "mcp.toml")
+        ToolsToml: str = os.path.join(ResourcesPath, "tools.toml")
         EnvPath: str = os.path.join(ResourcesPath, ".env")
 
         @classmethod

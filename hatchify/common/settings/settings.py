@@ -204,7 +204,7 @@ class AppSettings(BaseSettings):
         )
 
 
-@lru_cache
+@lru_cache(maxsize=1)
 def get_hatchify_settings():
     app_settings = AppSettings()
     return app_settings.hatchify
