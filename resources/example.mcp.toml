@@ -25,17 +25,6 @@ rejected = ["get-actor-output"]
 
 
 [[servers]]
-name = "jina"
-transport = "streamablehttp"
-enabled = false
-url = "https://mcp.jina.ai/v1"
-prefix = "jina__"
-[servers.headers]
-Authorization = "Bearer your-jina-api-key-here"
-
-
-
-[[servers]]
 name = "linkedin_scraper"
 transport = "streamablehttp"
 enabled = false
@@ -46,6 +35,16 @@ Authorization = "Bearer your-apify-api-key-here"
 [servers.tool_filters]
 rejected = ["get-actor-output"]
 
+
+
+[[servers]]
+name = "jina"
+transport = "streamablehttp"
+enabled = false
+url = "https://mcp.jina.ai/v1"
+prefix = "jina__"
+[servers.headers]
+Authorization = "Bearer your-jina-api-key-here"
 
 
 [[servers]]
