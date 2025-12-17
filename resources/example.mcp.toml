@@ -1,16 +1,46 @@
-# ============================================
-# MCP 服务器配置文件
-# 支持三种连接类型: stdio, sse, streamablehttp
-# ============================================
+[[servers]]
+name = "ahrefs_scraper"
+transport = "streamablehttp"
+enabled = false
+url = "https://mcp.apify.com/?tools=radeance/ahrefs-scraper"
+prefix = "ahrefs_scraper__"
+[servers.headers]
+Authorization = "Bearer your-apify-api-key-here"
+[servers.tool_filters]
+rejected = ["get-actor-output"]
 
-# --------------------------------------------
-# Stdio 类型示例
-# 适用于命令行启动的 MCP 服务器
-# --------------------------------------------
+
+
+[[servers]]
+name = "semrush_scraper"
+transport = "streamablehttp"
+enabled = false
+url = "https://mcp.apify.com/?tools=radeance/semrush-scraper"
+prefix = "semrush_scraper__"
+[servers.headers]
+Authorization = "Bearer your-apify-api-key-here"
+[servers.tool_filters]
+rejected = ["get-actor-output"]
+
+
+
+[[servers]]
+name = "linkedin_scraper"
+transport = "streamablehttp"
+enabled = false
+url = "https://mcp.apify.com/?tools=dev_fusion/linkedin-profile-scraper"
+prefix = "linkedin_scraper__"
+[servers.headers]
+Authorization = "Bearer your-apify-api-key-here"
+[servers.tool_filters]
+rejected = ["get-actor-output"]
+
+
+
 [[servers]]
 name = "filesystem"
 transport = "stdio"
-enabled = true
+enabled = false
 command = "npx"
 args = ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]
 prefix = "fs"
@@ -21,6 +51,8 @@ encoding_error_handler = "strict"
 # 可选: 环境变量
 [servers.env]
 NODE_ENV = "production"
+
+
 
 [[servers]]
 name = "aws-docs"
