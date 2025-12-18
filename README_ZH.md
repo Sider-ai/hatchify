@@ -35,11 +35,17 @@ Hatchify 是一个强大的多智能体工作流平台，通过动态图执行�
 
 ### 环境要求
 
+**后端：**
 - Python 3.13+
 - SQLite / PostgreSQL (可选)
-- Node.js 18+ (用于 Web Builder 功能)
+
+**前端：**
+- Node.js 20+
+- pnpm 9+
 
 ### 安装
+
+#### 后端
 
 ```bash
 # 克隆仓库
@@ -50,12 +56,28 @@ cd hatchify
 uv sync
 ```
 
+#### 前端
+
+```bash
+# 进入 web 目录
+cd web
+
+# 安装依赖
+pnpm install
+
+# 构建图标包（首次运行前必需）
+pnpm build:icons
+```
+
 ### 配置
+
+#### 后端配置
 
 1. **复制配置文件**
 ```bash
 cp resources/example.mcp.toml resources/mcp.toml
 cp resources/example.models.toml resources/models.toml
+cp resources/example.tools.toml resources/tools.toml
 ```
 
 2. **编辑模型配置** (`resources/models.toml`)
@@ -67,7 +89,15 @@ api_key = "your-api-key-here"
 api_base = "https://api.openai.com/v1"
 ```
 
-3. **编辑 MCP 服务器配置** (`resources/mcp.toml`)（可选）
+3. **编辑预定义工具配置** (`resources/tools.toml`)（可选）
+```toml
+[nano_banana]
+enabled = true
+model = "gemini-3-pro-image-preview"
+api_key = "your-google-genai-api-key"
+```
+
+4. **编辑 MCP 服务器配置** (`resources/mcp.toml`)（可选）
 ```toml
 [[servers]]
 name = "filesystem"
@@ -76,7 +106,20 @@ command = "npx"
 args = ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/workspace"]
 ```
 
+#### 前端配置
+
+在 `web` 目录下创建 `.env` 文件：
+
+```bash
+# API 端点配置（默认：http://localhost:8000）
+VITE_API_TARGET=http://localhost:8000
+```
+
+查看 `web/.env.example` 了解所有可用的环境变量。
+
 ### 启动
+
+#### 后端
 
 ```bash
 # 开发模式
@@ -87,6 +130,24 @@ python main.py
 ```
 
 访问 http://localhost:8000/docs 查看 API 文档。
+
+#### 前端
+
+```bash
+# 进入 web 目录（如果尚未进入）
+cd web
+
+# 开发模式（热重载）
+pnpm dev
+
+# 生产构建
+pnpm build
+
+# 预览生产构建
+pnpm preview
+```
+
+访问 http://localhost:5173（默认 Vite 开发服务器端口）使用 Web 界面。
 
 ### Docker 部署
 
