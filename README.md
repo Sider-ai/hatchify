@@ -35,11 +35,17 @@ Hatchify is a powerful multi-agent workflow platform that enables complex AI Age
 
 ### Requirements
 
+**Backend:**
 - Python 3.13+
 - SQLite / PostgreSQL (optional)
-- Node.js 18+ (for Web Builder functionality)
+
+**Frontend:**
+- Node.js 20+
+- pnpm 9+
 
 ### Installation
+
+#### Backend
 
 ```bash
 # Clone repository
@@ -50,7 +56,22 @@ cd hatchify
 uv sync
 ```
 
+#### Frontend
+
+```bash
+# Navigate to web directory
+cd web
+
+# Install dependencies
+pnpm install
+
+# Build icons package (required before first run)
+pnpm build:icons
+```
+
 ### Configuration
+
+#### Backend Configuration
 
 1. **Copy configuration files**
 ```bash
@@ -85,7 +106,20 @@ command = "npx"
 args = ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/workspace"]
 ```
 
+#### Frontend Configuration
+
+Create `.env` file in the `web` directory:
+
+```bash
+# API endpoint configuration (default: http://localhost:8000)
+VITE_API_TARGET=http://localhost:8000
+```
+
+See `web/.env.example` for all available environment variables.
+
 ### Launch
+
+#### Backend
 
 ```bash
 # Development mode
@@ -96,6 +130,24 @@ python main.py
 ```
 
 Visit http://localhost:8000/docs to view API documentation.
+
+#### Frontend
+
+```bash
+# Navigate to web directory (if not already there)
+cd web
+
+# Development mode (with hot reload)
+pnpm dev
+
+# Production build
+pnpm build
+
+# Preview production build
+pnpm preview
+```
+
+Visit http://localhost:5173 (default Vite dev server port) to access the web interface.
 
 ### Docker Deployment
 
