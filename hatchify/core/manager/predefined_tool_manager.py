@@ -91,11 +91,23 @@ class DouBaoTTSCardPreDefined(BasePreDefinedToolCard):
                 )
         return self
 
+
+class IntoMdCardPreDefined(BasePreDefinedToolCard):
+    base_url: str = Field(
+        default="https://into.md",
+        description="into.md service base URL",
+    )
+    timeout: float = Field(
+        default=30.0,
+        description="HTTP request timeout in seconds",
+    )
+
 class PreDefinedToolsConfig(BaseModel):
     nano_banana: Optional[NanoBananaCardPreDefined] = None
     seed_dance: Optional[SeedDanceCardPreDefined] = None
     seed_dream: Optional[SeedDreamCardPreDefined] = None
     dou_bao_tts: Optional[DouBaoTTSCardPreDefined] = None
+    into_md: Optional[IntoMdCardPreDefined] = None
 
 
 class PreDefinedToolManager(BaseModel):

@@ -37,3 +37,13 @@ url = "https://openspeech.bytedance.com/api/v3/tts/unidirectional"
 resource_id = "volc.service_type.10029"
 speaker = "zh_male_beijingxiaoye_emo_v2_mars_bigtts"
 api_key = ""
+
+# ============================================
+# into.md Tool
+# ============================================
+# Converts any webpage into LLM-friendly markdown.
+# No API key required.
+[into_md]
+enabled = false
+base_url = "https://into.md"
+timeout = 30.0

@@ -80,6 +80,12 @@ async def async_load_pre_defined_tools():
         tool_factory.include_router(dou_bao_tts_router)
         logger.info("Loaded predefined tool: dou_bao_tts")
 
+    if pre_defined_tools_config.into_md and pre_defined_tools_config.into_md.enabled:
+        from hatchify.core.graph.tools.into_md_tool import into_md_router
+
+        tool_factory.include_router(into_md_router)
+        logger.info("Loaded predefined tool: into_md")
+
 
 
 tool_factory.include_router(math_router)
